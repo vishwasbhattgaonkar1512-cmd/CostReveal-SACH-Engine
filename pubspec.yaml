@@ -37,6 +37,7 @@ dependencies:
   provider: ^6.1.5+1
   fl_chart: ^1.2.0
   google_fonts: ^8.2.1
+  wakelock_plus: ^1.8.0
 
 dev_dependencies:
   flutter_test:
