@@ -1,0 +1,143 @@
+
+THE ANTI-CONFLICT EXECUTION PROTOCOL (Sept 19 - Sept 22)
+
+🏗️ THE DATA CONTRACT (EVERYONE READS THIS)
+
+To stop AI from hallucinating different variable names, the entire app will use
+these exact JSON keys and variable names. Do not let your AI change these.
+
+  - principal_amount (double)
+  - tenure_months (int)
+  - advertised_flat_rate (double)
+  - upfront_processing_fee (double)
+  - monthly_insurance_premium (double)
+
+👨‍💻 M1: ENGINE & COMPLIANCE (The Brain)
+
+Your Rule: You write logic. You do not touch the lib/ui/ folder. Ever.
+
+  - Task 1: The Repository & Models (DO THIS FIRST)
+
+      - Create the GitHub repo. Add everyone.
+      - Create lib/models/loan_terms.dart. Define the CandidateLoanTerms and
+        ConfirmedLoanTerms classes using the exact variables listed above.
+      - Create lib/state/app_state.dart using Provider (Do not let AI use
+        Riverpod, BLoC, or GetX).
+      - Commit and Push to main.
+      - 🛑 [WAIT STATE - RED FLAG]: STOP HERE. Tell M2 and M3 "The models are
+        pushed." Do not proceed until they pull the code.
+
+  - Task 2: The Math Engine
+
+      - Create lib/engine/math_engine.dart.
+      - Prompt your AI to write a deterministic IRR solver in pure Dart that
+        takes ConfirmedLoanTerms as input and returns a CalculationResult (True
+        APR, Total Hidden Cost).
+      - Run unit tests on this file.
+
+  - Task 3: The PDF Drafter
+
+      - Create lib/engine/pdf_generator.dart.
+      - Use the pdf package. Generate a document that takes CalculationResult
+        and prints it into a formal layout with the "DRAFT ONLY" watermark.
+
+🎨 M2: VISUALIZER (The UI)
+
+Your Rule: You draw the screens. You do not write math. You do not write API
+calls.
+
+  - 🛑 [WAIT STATE - RED FLAG]: DO NOT WRITE A SINGLE LINE OF CODE UNTIL M1
+    PUSHES lib/models/loan_terms.dart.
+
+  - Once M1 pushes, pull the main branch.
+
+  - Task 1: The Input & Validation Screens
+
+      - Create lib/ui/input_screen.dart. Make 3 buttons (Manual, Voice, Camera).
+      - Create lib/ui/validation_screen.dart. This screen MUST take
+        CandidateLoanTerms, display them in text fields, and have a "Confirm"
+        button that converts them to ConfirmedLoanTerms.
+
+  - Task 2: The Crime Scene (Chart)
+
+      - Create lib/ui/true_cost_screen.dart.
+      - Prompt your AI: "Use fl_chart to draw two lines based on
+        ConfirmedLoanTerms. Green line is advertised instalment * months. Red
+        line is actual outflow + upfront fees."
+      - If the AI tries to write math calculation logic inside this UI file,
+        delete it. The UI must only call M1's math_engine.dart.
+
+  - Task 3: UI Polish
+
+      - Apply Noto Sans Devanagari font globally in pubspec.yaml.
+      - Add the "Demo Mode" toggle to the home screen.
+
+🌉 M3: BRIDGE (AI & Native Sensors)
+
+Your Rule: You handle the outside world. Camera, Mic, and Gemini. You do not
+touch UI files or Math files.
+
+  - 🛑 [WAIT STATE - RED FLAG]: DO NOT WRITE API CALLS UNTIL M1 PUSHES THE
+    MODELS. Your JSON from Gemini MUST exactly map to M1's models.
+
+  - Task 1: Native Sensors
+
+      - Create lib/bridge/sensor_handler.dart.
+      - Implement camera package to take a picture and convert to Base64.
+      - Implement speech_to_text to grab a String of Hindi audio.
+
+  - Task 2: Gemini API Integration
+
+      - Create lib/bridge/gemini_api.dart.
+      - CRITICAL PROMPT INSTRUCTION: When generating this code, tell your AI:
+        "Send this text/image to Gemini 1.5 Flash. The system prompt MUST force
+        Gemini to return strict JSON with these exact keys: principal_amount,
+        tenure_months, advertised_flat_rate, upfront_processing_fee,
+        monthly_insurance_premium. Do not return markdown."
+      - Parse that JSON into M1's CandidateLoanTerms model.
+
+  - Task 3: Error Handling & 429
+
+      - Wrap the Gemini call in a try/catch. If it catches an HTTP 429 (Rate
+        Limit) or network error, return a custom exception
+        AIUnavailableException. (M2's UI will catch this and show the Manual
+        fallback).
+
+🎯 M4: SNIPER (Data, QA, & Dictator - THAT'S YOU)
+
+Your Rule: You are the gatekeeper. Code does not go to main without your
+approval. You prevent the team from destroying themselves.
+
+  - Task 1: The Excel Oracle (No Python allowed)
+
+      - Open Microsoft Excel. Build the 10 Golden Truth test cases using
+        standard =XIRR() formulas.
+      - Calculate the exact True APR for 5 different flat-rate/fee combinations.
+        Keep this sheet open on your desktop.
+
+  - Task 2: The Physical Props
+
+      - Print 5 real-looking Key Fact Statements (KFS). Crumple one up. Draw on
+        one with a pen. Give these to M3 to test the camera.
+
+  - Task 3: Merge Dictator (Anti-Conflict Protocol)
+
+      - When M2 or M3 finish a feature, they create a Pull Request (PR) or send
+        you a zip of their branch.
+      - YOU pull it to your local machine. You run it.
+      - You input a test case from your Excel sheet. If M1 and M2's code spits
+        out an APR that is even 0.1% different from your Excel sheet, you reject
+        the code and tell them to fix it.
+      - If M3's camera crashes the app instead of falling back to manual entry
+        gracefully, you reject the code.
+
+🚦 THE DAILY CADENCE (For M4 to Enforce)
+
+  - Saturday (Today): M1 pushes models. M1 builds Math. M2 builds empty UI
+    screens. M3 gets camera/mic working.
+  - Sunday: M2 links UI to M1's math. M3 connects Gemini API to output
+    CandidateLoanTerms.
+  - Monday: Integration. M3's data flows into M2's validation screen, which
+    flows into M1's math engine. M4 tests with WiFi off. Fix bugs.
+  - Tuesday: Submit.
+
