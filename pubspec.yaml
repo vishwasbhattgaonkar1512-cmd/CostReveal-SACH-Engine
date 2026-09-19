@@ -38,6 +38,8 @@ dependencies:
   fl_chart: ^1.2.0
   google_fonts: ^8.2.1
   wakelock_plus: ^1.8.0
+  camera: ^0.12.1
+  speech_to_text: ^7.5.0
 
 dev_dependencies:
   flutter_test:
