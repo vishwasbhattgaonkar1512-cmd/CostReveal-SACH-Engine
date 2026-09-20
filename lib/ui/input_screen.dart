@@ -4,6 +4,7 @@ import '../state/app_state.dart';
 import 'package:provider/provider.dart';
 import 'validation_screen.dart';
 import 'fallback_screen.dart';
+import 'widgets/bouncing_touch.dart'; // <--- PREMIUM ADDITION
 
 class InputScreen extends StatefulWidget {
   const InputScreen({super.key});
@@ -59,8 +60,6 @@ class _InputScreenState extends State<InputScreen>
         return;
       }
 
-      // Show what was heard, then route to Validation for manual confirmation.
-      // (Gemini parsing is M3's Task 2 — intentionally blocked until M1 models are final.)
       _showSpeechConfirmDialog(spokenText);
     } catch (e) {
       if (!mounted) return;
@@ -140,7 +139,6 @@ class _InputScreenState extends State<InputScreen>
 
       if (!mounted) return;
 
-      // Pass base64 to AppState so M3's Gemini bridge can pick it up later.
       Provider.of<AppState>(context, listen: false)
           .setPendingCameraImage(base64Image);
 
@@ -326,7 +324,7 @@ class _InputScreenState extends State<InputScreen>
     required String label,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    return BouncingTouch(
       onTap: onTap,
       child: Container(
         height: 60,
