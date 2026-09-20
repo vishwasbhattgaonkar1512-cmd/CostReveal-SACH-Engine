@@ -7,6 +7,15 @@ class AppState extends ChangeNotifier {
   ConfirmedLoanTerms? confirmedTerms;
   CalculationResult? calcResult;
 
+  /// Stores the Base64 image from M3's camera bridge.
+  /// Will be consumed by Gemini API (M3 Task 2) once M1 models are finalized.
+  String? pendingCameraImage;
+
+  void setPendingCameraImage(String base64) {
+    pendingCameraImage = base64;
+    notifyListeners();
+  }
+
   void updateCandidate({
     double? principal,
     int? months,
