@@ -41,7 +41,7 @@ dependencies:
   camera: ^0.12.1
   speech_to_text: ^7.5.0
   pdf: ^3.11.0
-
+  http: ^1.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
