@@ -60,35 +60,35 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
+    final state = Provider.of<AppProvider>(context);
     final terms = state.confirmedTerms;
-    final calc  = state.calcResult;
+    final calc  = state.calculationResult;
 
     if (terms == null || calc == null) {
-      return const Scaffold(body: Center(child: Text('Koi data nahi.')));
+      return const Scaffold(body: Center(child: Text('Error: No data')));
     }
 
-    final advertisedInstalment = terms.principalAmount / terms.tenureMonths +
-        (terms.principalAmount * (terms.advertisedFlatRate / 100) / 12);
+    final advertisedInstalment = terms.principal_amount / terms.tenure_months +
+        (terms.principal_amount * (terms.advertised_flat_rate / 100) / 12);
 
     final List<FlSpot> greenSpots = [];
     final List<FlSpot> redSpots   = [];
 
     double greenAcc = 0;
-    double redAcc   = terms.upfrontProcessingFee; // fee taken on day 0
+    double redAcc   = terms.upfront_processing_fee; // fee taken on day 0
 
     greenSpots.add(FlSpot(0, greenAcc));
     redSpots.add(FlSpot(0, redAcc));
 
-    for (int m = 1; m <= terms.tenureMonths; m++) {
+    for (int m = 1; m <= terms.tenure_months; m++) {
       greenAcc += advertisedInstalment;
-      redAcc   += calc.monthlyInstalment;
+      redAcc   += calc.actual_monthly_outflow;
       greenSpots.add(FlSpot(m.toDouble(), greenAcc));
       redSpots.add(FlSpot(m.toDouble(), redAcc));
     }
 
     final double maxY           = redSpots.last.y * 1.1;
-    final double schoolMonths   = calc.totalHiddenCost / 3200;
+    final double schoolMonths   = calc.total_hidden_cost / 3200;
 
     return Scaffold(
       backgroundColor: AppTheme.bg,
@@ -105,7 +105,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
               child: Column(
                 children: [
                   Text(
-                    '${calc.trueApr.toStringAsFixed(1)}%',
+                    '${calc.true_apr.toStringAsFixed(1)}%',
                     style: const TextStyle(
                       fontSize: 40, // Massive for hero stat
                       fontWeight: AppTheme.numberWeight,
@@ -136,7 +136,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                   final vRed   = _showRed ? _trim(redSpots, _redProg.value) : <FlSpot>[];
 
                   return LineChart(LineChartData(
-                    minX: 0, maxX: terms.tenureMonths.toDouble(),
+                    minX: 0, maxX: terms.tenure_months.toDouble(),
                     minY: 0, maxY: maxY,
                     gridData:   FlGridData(show: false),
                     borderData: FlBorderData(show: false),
@@ -203,7 +203,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
               child: Column(
                 children: [
                   Text(
-                    '₹${calc.totalHiddenCost.toStringAsFixed(0)} gayab ho gaye',
+                    '₹${calc.total_hidden_cost.toStringAsFixed(0)} gayab ho gaye',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: AppTheme.numberWeight,
@@ -213,7 +213,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    '₹${calc.totalHiddenCost.toStringAsFixed(0)} disappeared',
+                    '₹${calc.total_hidden_cost.toStringAsFixed(0)} disappeared',
                     style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.red),
                     textAlign: TextAlign.center,
                   ),

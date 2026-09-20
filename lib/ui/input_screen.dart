@@ -139,7 +139,7 @@ class _InputScreenState extends State<InputScreen>
 
       if (!mounted) return;
 
-      Provider.of<AppState>(context, listen: false)
+      Provider.of<AppProvider>(context, listen: false)
           .setPendingCameraImage(base64Image);
 
       _showSnack('Camera image captured. Gemini parsing pending (M3 Task 2).');
@@ -348,3 +348,4 @@ class _InputScreenState extends State<InputScreen>
     );
   }
 }
+

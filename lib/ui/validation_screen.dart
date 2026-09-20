@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../state/app_state.dart';
+import '../models/loan_terms.dart';
 import 'true_cost_screen.dart';
 import 'widgets/bouncing_touch.dart';
 
@@ -34,7 +35,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context, listen: false);
+    final appState = Provider.of<AppProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: AppTheme.bg,
@@ -89,35 +90,35 @@ class _ValidationScreenState extends State<ValidationScreen> {
             sublabel:    'Principal Amount',
             controller:  _principalCtrl,
             fieldKey:    'principal',
-            onChanged:   (v) => appState.updateCandidate(principal: double.tryParse(v)),
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(principal_amount: double.tryParse(v))),
           ),
           _buildCard(
             label:       'Avadhi (mahine mein)',
             sublabel:    'Tenure in Months',
             controller:  _monthsCtrl,
             fieldKey:    'months',
-            onChanged:   (v) => appState.updateCandidate(months: int.tryParse(v)),
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(tenure_months: int.tryParse(v))),
           ),
           _buildCard(
             label:       'Batayi gayi dar',
             sublabel:    'Advertised Flat Rate (%)',
             controller:  _flatRateCtrl,
             fieldKey:    'rate',
-            onChanged:   (v) => appState.updateCandidate(flatRate: double.tryParse(v)),
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(advertised_flat_rate: double.tryParse(v))),
           ),
           _buildCard(
             label:       'Processing shulk',
             sublabel:    'Upfront Processing Fee',
             controller:  _procFeeCtrl,
             fieldKey:    'fee',
-            onChanged:   (v) => appState.updateCandidate(procFee: double.tryParse(v)),
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(upfront_processing_fee: double.tryParse(v))),
           ),
           _buildCard(
             label:       'Maasik bima',
             sublabel:    'Monthly Insurance Premium',
             controller:  _insuranceCtrl,
             fieldKey:    'insurance',
-            onChanged:   (v) => appState.updateCandidate(insurance: double.tryParse(v)),
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(monthly_insurance_premium: double.tryParse(v))),
           ),
 
           const SizedBox(height: 32),
@@ -125,7 +126,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
           ElevatedButton(
             onPressed: _allConfirmed
                 ? () {
-                    appState.confirmTerms();
+                    if (appState.validateAndConfirmTerms()) { appState.calculateTrueAPR(); }
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const TrueCostScreen()),
@@ -235,3 +236,4 @@ class _ValidationScreenState extends State<ValidationScreen> {
     );
   }
 }
+
