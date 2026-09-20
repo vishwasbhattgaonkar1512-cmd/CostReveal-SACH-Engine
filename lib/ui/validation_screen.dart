@@ -34,6 +34,31 @@ class _ValidationScreenState extends State<ValidationScreen> {
   int  get _totalFields    => _confirmed.length;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final candidate = Provider.of<AppProvider>(context, listen: false).candidateTerms;
+      if (candidate != null) {
+        if (candidate.principal_amount != null) {
+          _principalCtrl.text = candidate.principal_amount!.toString().replaceAll(RegExp(r'\.0$'), '');
+        }
+        if (candidate.tenure_months != null) {
+          _monthsCtrl.text = candidate.tenure_months!.toString();
+        }
+        if (candidate.advertised_flat_rate != null) {
+          _flatRateCtrl.text = candidate.advertised_flat_rate!.toString().replaceAll(RegExp(r'\.0$'), '');
+        }
+        if (candidate.upfront_processing_fee != null) {
+          _procFeeCtrl.text = candidate.upfront_processing_fee!.toString().replaceAll(RegExp(r'\.0$'), '');
+        }
+        if (candidate.monthly_insurance_premium != null) {
+          _insuranceCtrl.text = candidate.monthly_insurance_premium!.toString().replaceAll(RegExp(r'\.0$'), '');
+        }
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppProvider>(context, listen: false);
 

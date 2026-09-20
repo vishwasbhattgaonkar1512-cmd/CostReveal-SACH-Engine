@@ -45,7 +45,7 @@ class GeminiApi {
 
   Future<CandidateLoanTerms> _extract(List<Map<String, dynamic>> parts) async {
     final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/\$_model:generateContent?key=\$_apiKey');
+        'https://generativelanguage.googleapis.com/v1beta/models/$_model:generateContent');
 
     final body = jsonEncode({
       "contents": [
@@ -69,18 +69,44 @@ class GeminiApi {
     });
 
     try {
-      final response = await _client.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: body,
-      ).timeout(const Duration(seconds: 30));
+      int retryCount = 0;
+      http.Response? response;
+
+      while (retryCount < 3) {
+        response = await _client.post(
+          url,
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": _apiKey,
+          },
+          body: body,
+        ).timeout(const Duration(seconds: 30));
+
+        if (response.statusCode == 503 && retryCount < 2) {
+          retryCount++;
+          await Future.delayed(Duration(seconds: retryCount == 1 ? 1 : 2));
+          continue;
+        }
+        
+        break;
+      }
+
+      if (response == null) {
+        throw AIUnavailableException('Failed to receive response from AI.');
+      }
+
+      if (response.statusCode == 503) {
+        throw AIUnavailableException('AI service is temporarily busy. Please retry or use Manual Entry/Demo Mode.');
+      }
 
       if (response.statusCode == 429) {
         throw AIUnavailableException('High traffic detected. Please use manual entry or Demo Mode.');
       }
       
       if (response.statusCode != 200) {
-        throw AIUnavailableException('AI API error: HTTP \${response.statusCode}');
+        String safeBody = response.body.replaceAll(RegExp(r'[\r\n]+'), ' ');
+        if (safeBody.length > 100) safeBody = '${safeBody.substring(0, 100)}...';
+        throw AIUnavailableException('AI API error: HTTP ${response.statusCode} - $safeBody');
       }
 
       final jsonResponse = jsonDecode(response.body);

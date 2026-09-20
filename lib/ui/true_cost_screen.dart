@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../theme/app_theme.dart';
 import '../state/app_state.dart';
+import '../utils/formatters.dart';
 import 'rbi_draft_screen.dart';
 
 class TrueCostScreen extends StatefulWidget {
@@ -98,7 +99,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Hero stat ─────────────────────────────────────────────
+            // Hero stat
             Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: AppTheme.cardPadding),
               decoration: AppTheme.heroStatDecoration(AppTheme.red),
@@ -114,7 +115,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                     ),
                   ),
                   const Text(
-                    'Aap par itna bojh hai  (True APR)',
+                    'Aap par itna bojh hai  (Effective Annualized Cost)',
                     style: TextStyle(
                       fontSize: AppTheme.bodyMin,
                       color: AppTheme.white,
@@ -127,7 +128,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
             const SizedBox(height: 16),
 
-            // ── Chart (HERO of this screen) ────────────────────────────
+            // Chart (HERO of this screen)
             Expanded(
               child: AnimatedBuilder(
                 animation: Listenable.merge([_greenProg, _redProg]),
@@ -147,7 +148,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                       bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     ),
                     lineBarsData: [
-                      // Index 0: Jo Bataya — SOLID, green
+                      // Index 0: Jo Bataya - SOLID, green
                       LineChartBarData(
                         spots:    vGreen,
                         isCurved: false,
@@ -156,7 +157,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                         dotData:  FlDotData(show: false),
                         dashArray: null,
                       ),
-                      // Index 1: Asli Sach — DASHED, red
+                      // Index 1: Asli Sach - DASHED, red
                       if (vRed.isNotEmpty)
                         LineChartBarData(
                           spots:    vRed,
@@ -184,7 +185,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
             const SizedBox(height: 8),
 
-            // ── Legend ────────────────────────────────────────────────
+            // Legend
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -196,14 +197,14 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
             const SizedBox(height: 24), // Gestalt whitespace before emotional bomb
 
-            // ── Emotional bomb ─────────────────────────────────────────
+            // Emotional bomb
             Container(
               padding: const EdgeInsets.all(AppTheme.cardPadding),
               decoration: AppTheme.cardDecoration(borderColor: AppTheme.red),
               child: Column(
                 children: [
                   Text(
-                    '₹${calc.total_hidden_cost.toStringAsFixed(0)} gayab ho gaye',
+                    '₹${Formatters.formatAmountWithoutSymbol(calc.total_hidden_cost)} gayab ho gaye',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: AppTheme.numberWeight,
@@ -213,7 +214,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    '₹${calc.total_hidden_cost.toStringAsFixed(0)} disappeared',
+                    '₹${Formatters.formatAmountWithoutSymbol(calc.total_hidden_cost)} disappeared',
                     style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.red),
                     textAlign: TextAlign.center,
                   ),

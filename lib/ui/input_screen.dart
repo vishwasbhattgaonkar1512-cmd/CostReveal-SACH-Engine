@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../bridge/sensor_handler.dart';
+import '../bridge/gemini_api.dart';
 import '../state/app_state.dart';
 import 'package:provider/provider.dart';
 import 'validation_screen.dart';
@@ -18,6 +19,7 @@ class _InputScreenState extends State<InputScreen>
   bool _isDemoMode = false;
   bool _isListening = false;
   bool _isCapturing = false;
+  bool _isAiProcessing = false;
 
   final SensorHandler _sensor = SensorHandler();
 
@@ -45,7 +47,7 @@ class _InputScreenState extends State<InputScreen>
 
   // ── Voice Entry ─────────────────────────────────────────────────────────
   Future<void> _onMicTap() async {
-    if (_isListening) return;
+    if (_isListening || _isAiProcessing) return;
 
     setState(() => _isListening = true);
     _pulseController.stop();
@@ -110,12 +112,37 @@ class _InputScreenState extends State<InputScreen>
             child: const Text('Wapas jayein'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              if (_isAiProcessing) return;
+              setState(() => _isAiProcessing = true);
+              
               Navigator.pop(ctx);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ValidationScreen()),
-              );
+              
+              setState(() => _isListening = true);
+              try {
+                _showSnack('Voice captured. Extracting with AI...');
+                final geminiApi = GeminiApi();
+                final candidateTerms = await geminiApi.extractFromText(spokenText);
+                
+                if (!mounted) return;
+                Provider.of<AppProvider>(context, listen: false)
+                    .setCandidateTerms(candidateTerms);
+                    
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ValidationScreen()),
+                );
+              } catch (e) {
+                if (!mounted) return;
+                _showSnack('$e');
+              } finally {
+                if (mounted) {
+                  setState(() {
+                    _isListening = false;
+                    _isAiProcessing = false;
+                  });
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E3A8A),
@@ -129,9 +156,12 @@ class _InputScreenState extends State<InputScreen>
 
   // ── Camera Entry ─────────────────────────────────────────────────────────
   Future<void> _onCameraTap() async {
-    if (_isCapturing) return;
+    if (_isCapturing || _isAiProcessing) return;
 
-    setState(() => _isCapturing = true);
+    setState(() {
+      _isCapturing = true;
+      _isAiProcessing = true;
+    });
 
     try {
       await _sensor.initializeCamera();
@@ -139,22 +169,32 @@ class _InputScreenState extends State<InputScreen>
 
       if (!mounted) return;
 
-      Provider.of<AppProvider>(context, listen: false)
-          .setPendingCameraImage(base64Image);
+      final appProvider = Provider.of<AppProvider>(context, listen: false);
+      appProvider.setPendingCameraImage(base64Image);
 
-      _showSnack('Camera image captured. Gemini parsing pending (M3 Task 2).');
-      await Future.delayed(const Duration(milliseconds: 600));
+      _showSnack('Camera image captured. Extracting with AI...');
+      
+      final geminiApi = GeminiApi();
+      final candidateTerms = await geminiApi.extractFromImage(base64Image);
 
       if (!mounted) return;
+      
+      appProvider.setCandidateTerms(candidateTerms);
+      
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const ValidationScreen()),
       );
     } catch (e) {
       if (!mounted) return;
-      _showSnack('Camera error: $e');
+      _showSnack('$e');
     } finally {
-      if (mounted) setState(() => _isCapturing = false);
+      if (mounted) {
+        setState(() {
+          _isCapturing = false;
+          _isAiProcessing = false;
+        });
+      }
     }
   }
 

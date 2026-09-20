@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../models/loan_terms.dart';
+import '../utils/formatters.dart';
 
 class PDFGenerator {
   static Future<Uint8List> generateEvidenceDocument({
@@ -14,6 +15,9 @@ class PDFGenerator {
   }) async {
     final pdf = pw.Document();
     final date = documentDate ?? DateTime.now();
+    
+    String formatAmt(double amt) => Formatters.formatAmountWithoutSymbol(amt);
+    String formatPct(double pct) => pct.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '');
 
     pdf.addPage(
       pw.Page(
@@ -28,9 +32,9 @@ class PDFGenerator {
               child: pw.Column(
                 children: [
                   pw.Text(
-                    'DRAFT ONLY - NOT FOR SUBMISSION',
+                    'DRAFT ONLY - REVIEW BEFORE SUBMISSION',
                     style: pw.TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: pw.FontWeight.bold,
                       color: PdfColors.white,
                     ),
@@ -38,7 +42,7 @@ class PDFGenerator {
                   ),
                   pw.SizedBox(height: 5),
                   pw.Text(
-                    'SUBMIT VIA RBI OMBUDSMAN SCHEME (OMS) PORTAL',
+                    'DRAFT FOR RBI OMBUDSMAN COMPLAINT',
                     style: pw.TextStyle(
                       fontSize: 14,
                       fontWeight: pw.FontWeight.bold,
@@ -110,11 +114,11 @@ class PDFGenerator {
               border: pw.TableBorder.all(color: PdfColors.grey400),
               children: [
                 _buildHeaderRow(['Term', 'Value']),
-                _buildRow('Principal Amount', 'Rs. ${terms.principal_amount.toStringAsFixed(2)}'),
+                _buildRow('Principal Amount', 'Rs. ${formatAmt(terms.principal_amount)}'),
                 _buildRow('Loan Tenure', '${terms.tenure_months} months'),
-                _buildRow('Advertised Interest Rate', '${terms.advertised_flat_rate.toStringAsFixed(2)}%'),
-                _buildRow('Upfront Processing Fee', 'Rs. ${terms.upfront_processing_fee.toStringAsFixed(2)}'),
-                _buildRow('Monthly Insurance', 'Rs. ${terms.monthly_insurance_premium.toStringAsFixed(2)}'),
+                _buildRow('Advertised Interest Rate', '${formatPct(terms.advertised_flat_rate)}%'),
+                _buildRow('Upfront Processing Fee', 'Rs. ${formatAmt(terms.upfront_processing_fee)}'),
+                _buildRow('Monthly Insurance', 'Rs. ${formatAmt(terms.monthly_insurance_premium)}'),
               ],
             ),
 
@@ -146,7 +150,7 @@ class PDFGenerator {
                         padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         color: PdfColors.red,
                         child: pw.Text(
-                          '${(result.true_apr / terms.advertised_flat_rate).toStringAsFixed(2)}x DECEPTION',
+                          '${formatPct(result.true_apr / terms.advertised_flat_rate)}x DECEPTION',
                           style: pw.TextStyle(
                             fontSize: 12,
                             fontWeight: pw.FontWeight.bold,
@@ -163,24 +167,24 @@ class PDFGenerator {
                       _buildHeaderRow(['Metric', 'Advertised', 'ACTUAL TRUTH'], isAlert: true),
                       _buildComparisonRow(
                         'Annual Interest Rate',
-                        '${terms.advertised_flat_rate.toStringAsFixed(2)}%',
-                        '${result.true_apr.toStringAsFixed(2)}%',
+                        '${formatPct(terms.advertised_flat_rate)}%',
+                        '${formatPct(result.true_apr)}%',
                       ),
                       _buildComparisonRow(
                         'Amount Received',
-                        'Rs. ${terms.principal_amount.toStringAsFixed(2)}',
-                        'Rs. ${result.net_disbursed_amount.toStringAsFixed(2)}',
+                        'Rs. ${formatAmt(terms.principal_amount)}',
+                        'Rs. ${formatAmt(result.net_disbursed_amount)}',
                       ),
                       _buildComparisonRow(
                         'Monthly Payment',
                         '(Not Disclosed)',
-                        'Rs. ${result.actual_monthly_outflow.toStringAsFixed(2)}',
+                        'Rs. ${formatAmt(result.actual_monthly_outflow)}',
                       ),
                     ],
                   ),
                   pw.SizedBox(height: 10),
                   pw.Text(
-                    'Mathematical Proof: TRUE APR calculated using Internal Rate of Return (IRR) method.',
+                    'Cost analysis uses a deterministic cash-flow calculation. RBI KFS guidance requires disclosure of APR and associated charges. Verify the lender\'s KFS and applicable RBI requirements before submitting a complaint.\nSource: RBI — Key Facts Statement (KFS) for Loans & Advances, RBI/2024-25/18, April 15, 2024.',
                     style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey800),
                   ),
                 ],
@@ -199,16 +203,16 @@ class PDFGenerator {
               border: pw.TableBorder.all(color: PdfColors.grey400),
               children: [
                 _buildHeaderRow(['Description', 'Amount (Rs.)']),
-                _buildRow('Principal Amount', terms.principal_amount.toStringAsFixed(2)),
-                _buildRow('Less: Processing Fee', '- ${terms.upfront_processing_fee.toStringAsFixed(2)}'),
-                _buildRow('Net Amount Received', result.net_disbursed_amount.toStringAsFixed(2), isBold: true),
+                _buildRow('Principal Amount', formatAmt(terms.principal_amount)),
+                _buildRow('Less: Processing Fee', '- ${formatAmt(terms.upfront_processing_fee)}'),
+                _buildRow('Net Amount Received', formatAmt(result.net_disbursed_amount), isBold: true),
                 _buildRow('', ''),
-                _buildRow('Monthly EMI Base', (result.actual_monthly_outflow - terms.monthly_insurance_premium).toStringAsFixed(2)),
-                _buildRow('Add: Insurance', '+ ${terms.monthly_insurance_premium.toStringAsFixed(2)}'),
-                _buildRow('Total Monthly Outflow', result.actual_monthly_outflow.toStringAsFixed(2), isBold: true),
+                _buildRow('Monthly EMI Base', formatAmt(result.actual_monthly_outflow - terms.monthly_insurance_premium)),
+                _buildRow('Add: Insurance', '+ ${formatAmt(terms.monthly_insurance_premium)}'),
+                _buildRow('Total Monthly Outflow', formatAmt(result.actual_monthly_outflow), isBold: true),
                 _buildRow('', ''),
-                _buildRow('Total Paid', (result.actual_monthly_outflow * terms.tenure_months).toStringAsFixed(2)),
-                _buildRow('Total Hidden Cost', result.total_hidden_cost.toStringAsFixed(2), isBold: true),
+                _buildRow('Total Paid', formatAmt(result.actual_monthly_outflow * terms.tenure_months)),
+                _buildRow('Total Hidden Cost', formatAmt(result.total_hidden_cost), isBold: true),
               ],
             ),
 
@@ -229,7 +233,7 @@ class PDFGenerator {
                   pw.Text('Hidden Cost (Dirty Tricks Tax):', style: const pw.TextStyle(fontSize: 11)),
                   pw.SizedBox(height: 5),
                   pw.Text(
-                    'Rs. ${result.total_hidden_cost.toStringAsFixed(2)}',
+                    'Rs. ${formatAmt(result.total_hidden_cost)}',
                     style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold, color: PdfColors.orange900),
                   ),
                   pw.SizedBox(height: 10),
@@ -314,4 +318,4 @@ class PDFGenerator {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${date.day.toString().padLeft(2, '0')}-${months[date.month - 1]}-${date.year}';
   }
-}
+}

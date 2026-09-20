@@ -60,12 +60,20 @@ class SensorHandler {
     String recognizedText = '';
 
     await _speechToText.listen(
+      listenFor: const Duration(seconds: 30),
+      pauseFor: const Duration(seconds: 3),
       onResult: (result) {
         recognizedText = result.recognizedWords;
       },
     );
 
-    await Future.delayed(const Duration(seconds: 5));
+    // Give the engine a moment to start
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    // Wait until speech recognition naturally stops (due to pause or max duration)
+    while (_speechToText.isListening) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
 
     await _speechToText.stop();
 

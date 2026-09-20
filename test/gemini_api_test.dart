@@ -99,6 +99,30 @@ void main() {
       );
     });
 
+    for (final code in [400, 401, 403, 404]) {
+      test('HTTP $code exposes "HTTP $code" safely', () async {
+        final mockClient = MockClient((request) async {
+          return http.Response('Error from server', code);
+        });
+        final api = GeminiApi(apiKey: 'dummy', client: mockClient);
+
+        expect(
+          () => api.extractFromText('test'),
+          throwsA(
+            isA<AIUnavailableException>().having(
+              (e) => e.message,
+              'message',
+              allOf(
+                contains('HTTP $code'),
+                contains('Error from server'),
+                isNot(contains('dummy')), // API key shouldn't be exposed
+              ),
+            ),
+          ),
+        );
+      });
+    }
+
     test('Network failure maps to generic network error message', () async {
       final mockClient = MockClient((request) async {
         throw Exception('Connection refused');
@@ -119,6 +143,9 @@ void main() {
 
     test('Valid API response parses successfully', () async {
       final mockClient = MockClient((request) async {
+        expect(request.headers['x-goog-api-key'], 'dummy');
+        expect(request.url.queryParameters.containsKey('key'), isFalse);
+        
         final mockResponse = {
           "candidates": [
             {
@@ -142,6 +169,60 @@ void main() {
       final result = await api.extractFromText('test');
       expect(result.principal_amount, 10000.0);
       expect(result.tenure_months, 12);
+    });
+
+    test('First 503 then successful response', () async {
+      int attempt = 0;
+      final mockClient = MockClient((request) async {
+        attempt++;
+        if (attempt == 1) return http.Response('Service Unavailable', 503);
+        final mockResponse = {
+          "candidates": [{"content": {"parts": [{"text": jsonEncode({"principal_amount": 20000})}]}}]
+        };
+        return http.Response(jsonEncode(mockResponse), 200);
+      });
+      final api = GeminiApi(apiKey: 'dummy', client: mockClient);
+
+      final result = await api.extractFromText('test');
+      expect(result.principal_amount, 20000.0);
+      expect(attempt, 2);
+    });
+
+    test('Two 503 responses then successful response', () async {
+      int attempt = 0;
+      final mockClient = MockClient((request) async {
+        attempt++;
+        if (attempt <= 2) return http.Response('Service Unavailable', 503);
+        final mockResponse = {
+          "candidates": [{"content": {"parts": [{"text": jsonEncode({"principal_amount": 30000})}]}}]
+        };
+        return http.Response(jsonEncode(mockResponse), 200);
+      });
+      final api = GeminiApi(apiKey: 'dummy', client: mockClient);
+
+      final result = await api.extractFromText('test');
+      expect(result.principal_amount, 30000.0);
+      expect(attempt, 3);
+    });
+
+    test('Three consecutive 503 responses throws AIUnavailableException', () async {
+      int attempt = 0;
+      final mockClient = MockClient((request) async {
+        attempt++;
+        return http.Response('Service Unavailable', 503);
+      });
+      final api = GeminiApi(apiKey: 'dummy', client: mockClient);
+
+      expect(
+        () => api.extractFromText('test'),
+        throwsA(
+          isA<AIUnavailableException>().having(
+            (e) => e.message,
+            'message',
+            contains('AI service is temporarily busy. Please retry or use Manual Entry/Demo Mode.'),
+          ),
+        ),
+      );
     });
     
     test('Malformed JSON in response throws parsing error', () async {
