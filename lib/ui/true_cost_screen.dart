@@ -92,77 +92,113 @@ class _TrueCostScreenState extends State<TrueCostScreen>
       body: ListView(
         padding: const EdgeInsets.all(AppTheme.cardPadding),
         children: [
+          // Hero APR Card
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: AppTheme.cardPadding),
-            decoration: AppTheme.heroStatDecoration(AppTheme.red),
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: AppTheme.cardPadding),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppTheme.red, AppTheme.red.withValues(alpha: 0.8)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.red.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                )
+              ],
+            ),
             child: Column(
               children: [
+                const Text(
+                  'असली ब्याज दर (True APR)',
+                  style: TextStyle(fontSize: AppTheme.labelSize, color: Colors.white70, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
                 Text(
                   '${calc.true_apr.toStringAsFixed(1)}%',
                   style: const TextStyle(
-                    fontSize: 40,
+                    fontSize: 48,
                     fontWeight: AppTheme.numberWeight,
                     color: AppTheme.white,
                     letterSpacing: -1.5,
+                    height: 1.0,
                   ),
                 ),
+                const SizedBox(height: 8),
                 const Text(
-                  'आप पर इतना बोझ है  (True APR)',
-                  style: TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.white),
+                  'यह है आपका असली बोझ',
+                  style: TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.white, fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
 
-          const Text(
-            'आपको कुल कितना देना होगा?  (Total repayment over time)',
-            style: TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 220,
-            child: AnimatedBuilder(
-              animation: Listenable.merge([_greenProg, _redProg]),
-              builder: (context, _) {
-                final vGreen = _trim(greenSpots, _greenProg.value);
-                final vRed   = _showRed ? _trim(redSpots, _redProg.value) : <FlSpot>[];
+          // Chart Section
+          Container(
+            padding: const EdgeInsets.all(AppTheme.cardPadding),
+            decoration: AppTheme.cardDecoration(),
+            child: Column(
+              children: [
+                const Text(
+                  'आपको कुल कितना देना होगा?',
+                  style: TextStyle(fontSize: AppTheme.bodyMin, fontWeight: FontWeight.bold, color: AppTheme.navy),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 220,
+                  child: AnimatedBuilder(
+                    animation: Listenable.merge([_greenProg, _redProg]),
+                    builder: (context, _) {
+                      final vGreen = _trim(greenSpots, _greenProg.value);
+                      final vRed   = _showRed ? _trim(redSpots, _redProg.value) : <FlSpot>[];
 
-                return LineChart(LineChartData(
-                  minX: 0, maxX: terms.tenure_months.toDouble(),
-                  minY: 0, maxY: maxY,
-                  gridData:   FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  titlesData: const FlTitlesData(
-                    topTitles:    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles:  AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    leftTitles:   AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      return LineChart(LineChartData(
+                        minX: 0, maxX: terms.tenure_months.toDouble(),
+                        minY: 0, maxY: maxY,
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          getDrawingHorizontalLine: (value) => FlLine(color: AppTheme.border.withValues(alpha: 0.5), strokeWidth: 1),
+                        ),
+                        borderData: FlBorderData(show: false),
+                        titlesData: const FlTitlesData(
+                          topTitles:    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          rightTitles:  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          leftTitles:   AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        ),
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: vGreen, isCurved: true, curveSmoothness: 0.1,
+                            color: AppTheme.green, barWidth: 4,
+                            dotData: FlDotData(show: false), dashArray: null,
+                          ),
+                          if (vRed.isNotEmpty)
+                            LineChartBarData(
+                              spots: vRed, isCurved: true, curveSmoothness: 0.1,
+                              color: AppTheme.red, barWidth: 4,
+                              dotData: FlDotData(show: false), dashArray: [8, 4],
+                            ),
+                        ],
+                        betweenBarsData: vRed.isNotEmpty
+                            ? [BetweenBarsData(
+                                fromIndex: 0, toIndex: 1,
+                                color: AppTheme.red.withValues(alpha: 0.12),
+                              )]
+                            : [],
+                      ));
+                    },
                   ),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: vGreen, isCurved: false,
-                      color: AppTheme.green, barWidth: 5,
-                      dotData: FlDotData(show: false), dashArray: null,
-                    ),
-                    if (vRed.isNotEmpty)
-                      LineChartBarData(
-                        spots: vRed, isCurved: false,
-                        color: AppTheme.red, barWidth: 5,
-                        dotData: FlDotData(show: false), dashArray: [8, 4],
-                      ),
-                  ],
-                  betweenBarsData: vRed.isNotEmpty
-                      ? [BetweenBarsData(
-                          fromIndex: 0, toIndex: 1,
-                          color: AppTheme.red.withValues(alpha: 0.12),
-                        )]
-                      : [],
-                ));
-              },
+                ),
+              ],
             ),
           ),
 
@@ -171,52 +207,86 @@ class _TrueCostScreenState extends State<TrueCostScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _legendItem(AppTheme.green, 'जो बताया था  (Promised)', dashed: false),
+              _legendItem(AppTheme.green, 'जो बताया गया (Promised)', dashed: false),
               const SizedBox(width: 24),
-              _legendItem(AppTheme.red,   'असली सच  (True Cost)', dashed: true),
+              _legendItem(AppTheme.red, 'असली सच (True Cost)', dashed: true),
             ],
           ),
 
           const SizedBox(height: 24),
 
+          // Total Hidden Cost Loss Card
           Container(
             padding: const EdgeInsets.all(AppTheme.cardPadding),
-            decoration: AppTheme.cardDecoration(borderColor: AppTheme.red),
+            decoration: BoxDecoration(
+              color: AppTheme.red.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+              border: Border.all(color: AppTheme.red.withValues(alpha: 0.3), width: 1.5),
+            ),
             child: Column(
               children: [
-                Text(
-                  '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
-                  style: const TextStyle(
-                    fontSize: 24, fontWeight: AppTheme.numberWeight,
-                    color: AppTheme.red, letterSpacing: -0.5,
-                  ),
-                  textAlign: TextAlign.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: AppTheme.red, size: 28),
+                    const SizedBox(width: 8),
+                    Text(
+                      '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
+                      style: const TextStyle(
+                        fontSize: 26, fontWeight: AppTheme.numberWeight,
+                        color: AppTheme.red, letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 8),
                 Text(
                   'Loss of ₹${calc.total_hidden_cost.toStringAsFixed(0)}',
-                  style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.red),
-                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.red, fontWeight: FontWeight.w500),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
-                  style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary),
-                  textAlign: TextAlign.center,
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(color: Colors.black12, height: 1),
                 ),
-                Text(
-                  '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark ₹3,200)',
-                  style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
-                  textAlign: TextAlign.center,
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTheme.border),
+                      ),
+                      child: const Icon(Icons.school_rounded, color: AppTheme.navy, size: 24),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
+                            style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark)',
+                            style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
 
           const Text(
-            'महंगा क्यों हुआ?  (What Changed the Cost?)',
-            style: TextStyle(fontSize: AppTheme.bodyMin, fontWeight: FontWeight.bold, color: AppTheme.navy),
+            'महंगा क्यों हुआ? (What Changed the Cost?)',
+            style: TextStyle(fontSize: AppTheme.bodyMin, fontWeight: FontWeight.w700, color: AppTheme.navy),
           ),
           const SizedBox(height: 12),
           
@@ -245,24 +315,39 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
           Container(
             padding: const EdgeInsets.all(AppTheme.cardPadding),
-            decoration: AppTheme.cardDecoration(borderColor: const Color(0xFFF59E0B)),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+              border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'लोन को महंगा बनाने वाले कारण  (COST-AFFECTING PATTERNS)',
-                  style: TextStyle(
-                    fontSize: AppTheme.labelSize, fontWeight: FontWeight.w900,
-                    color: Color(0xFFF59E0B), letterSpacing: 0.5,
-                  ),
+                Row(
+                  children: [
+                    const Icon(Icons.warning_rounded, color: Color(0xFFF59E0B), size: 24),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'लोन को महंगा बनाने वाले कारण\n(Cost-Affecting Patterns)',
+                        style: TextStyle(
+                          fontSize: AppTheme.labelSize, fontWeight: FontWeight.w900,
+                          color: Color(0xFFD97706), letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                _patternRow('फ्लैट रेट (Flat Rate) का झांसा  (Flat-rate presentation)'),
-                _patternRow('पैसे पहले ही काट लेना  (Upfront deduction)'),
-                _patternRow('ज़बरदस्ती का इंश्योरेंस  (Insurance-related cost)'),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
+                _patternRow('फ्लैट रेट (Flat Rate) का झांसा'),
+                _patternRow('पैसे पहले ही काट लेना (Upfront deduction)'),
+                _patternRow('ज़बरदस्ती का इंश्योरेंस (Forced Insurance)'),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Divider(color: Colors.black12, height: 1),
+                ),
                 Text(
-                  '$patternCount cost-affecting patterns detected',
+                  '$patternCount patterns detected',
                   style: const TextStyle(
                     fontSize: AppTheme.labelSize, fontWeight: FontWeight.bold,
                     color: AppTheme.textSecondary,
@@ -272,72 +357,83 @@ class _TrueCostScreenState extends State<TrueCostScreen>
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
 
+          // Evidence Trace (Receipt Style)
           GestureDetector(
             onTap: () => setState(() => _evidenceExpanded = !_evidenceExpanded),
             child: Container(
               padding: const EdgeInsets.all(AppTheme.cardPadding),
-              decoration: AppTheme.cardDecoration(borderColor: AppTheme.navy),
+              decoration: BoxDecoration(
+                color: AppTheme.white,
+                borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+                border: Border.all(color: AppTheme.border, width: 1.5),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+                ],
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'हमने यह कैसे हिसाब लगाया?\n(How did we calculate this?)',
-                        style: TextStyle(
-                          fontSize: AppTheme.bodyMin,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.navy,
+                      const Expanded(
+                        child: Text(
+                          'हमने यह कैसे हिसाब लगाया?\n(How did we calculate this?)',
+                          style: TextStyle(
+                            fontSize: AppTheme.bodyMin,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.navy,
+                          ),
                         ),
                       ),
                       Icon(
-                        _evidenceExpanded ? Icons.expand_less : Icons.expand_more,
+                        _evidenceExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                         color: AppTheme.navy, size: 28,
                       ),
                     ],
                   ),
                   if (_evidenceExpanded) ...[
                     const SizedBox(height: 16),
-                    _evidenceRow('लोन की रकम  (Sanctioned Amount)',
-                        '₹${calc.sanctioned_amount.toStringAsFixed(0)}'),
+                    _evidenceRow('लोन की रकम\n(Sanctioned Amount)', '₹${calc.sanctioned_amount.toStringAsFixed(0)}'),
                     _evidenceArrow(),
-                    _evidenceRow('प्रोसेसिंग फीस  (Processing Fee)',
-                        '₹${calc.processing_fee.toStringAsFixed(0)}'),
+                    _evidenceRow('प्रोसेसिंग फीस\n(Processing Fee)', '- ₹${calc.processing_fee.toStringAsFixed(0)}', isDeduction: true),
                     _evidenceArrow(),
-                    _evidenceRow('इंश्योरेंस का खर्चा  (Insurance Cost)',
-                        '₹${calc.insurance_cost.toStringAsFixed(0)}/month'),
+                    _evidenceRow('इंश्योरेंस का खर्चा\n(Insurance Cost)', '- ₹${calc.insurance_cost.toStringAsFixed(0)}', isDeduction: true),
                     _evidenceArrow(),
-                    _evidenceRow('हाथ में कितने पैसे आए  (Net Amount Received)',
-                        '₹${calc.net_disbursed_amount.toStringAsFixed(0)}'),
-                    _evidenceArrow(),
-                    _evidenceRow('हर महीने की किश्त  (Monthly Cash Flow)',
-                        '₹${calc.actual_monthly_outflow.toStringAsFixed(0)}/month'),
-                    _evidenceArrow(),
-                    _evidenceRow('महीने का ब्याज दर  (Monthly IRR)',
-                        '${calc.monthly_irr.toStringAsFixed(2)}%'),
-                    _evidenceArrow(),
-                    _evidenceRow('साल का असली ब्याज दर  (Effective Annualized Cost)',
-                        '${calc.true_apr.toStringAsFixed(2)}%',
-                        highlight: true),
+                    _evidenceRow('हाथ में कितने पैसे आए\n(Net Amount Received)', '₹${calc.net_disbursed_amount.toStringAsFixed(0)}', isBold: true),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(color: Colors.black12, height: 1),
+                    ),
+                    _evidenceRow('हर महीने की किश्त\n(Monthly Cash Flow)', '₹${calc.actual_monthly_outflow.toStringAsFixed(0)}/mo', isBold: true),
+                    _evidenceRow('महीने का ब्याज दर\n(Monthly IRR)', '${calc.monthly_irr.toStringAsFixed(2)}%'),
+                    const SizedBox(height: 12),
+                    _evidenceRow('असली ब्याज दर\n(True APR)', '${calc.true_apr.toStringAsFixed(2)}%', highlight: true),
                   ],
                 ],
               ),
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 32),
 
           ElevatedButton(
             onPressed: () => Navigator.push(
                 context, MaterialPageRoute(builder: (_) => const RbiDraftScreen())),
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.navy, foregroundColor: AppTheme.white,
+                elevation: 4,
+                shadowColor: AppTheme.navy.withValues(alpha: 0.4),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 minimumSize: const Size(double.infinity, 60)),
-            child: const Text('अपनी रिपोर्ट देखें  (Review Your Result)'),
+            child: const Text(
+              'अपनी रिपोर्ट देखें (Review Your Result)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -346,33 +442,43 @@ class _TrueCostScreenState extends State<TrueCostScreen>
   Widget _costChangeCard({required String title, required String subtitle, required String impact, required IconData icon}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppTheme.border, width: 1.5),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))
+        ]
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppTheme.red.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: AppTheme.red, size: 24),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.textPrimary)),
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary)),
                 const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
-                const SizedBox(height: 6),
-                Text('⚠️ $impact', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.red)),
+                Text(subtitle, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, height: 1.4)),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.red.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text('⚠️ $impact', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.red)),
+                ),
               ],
             ),
           ),
@@ -402,43 +508,63 @@ class _TrueCostScreenState extends State<TrueCostScreen>
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.warning_amber_rounded, color: Color(0xFFF59E0B), size: 20),
-          const SizedBox(width: 8),
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(Icons.circle, color: Color(0xFFF59E0B), size: 8),
+          ),
+          const SizedBox(width: 12),
           Expanded(child: Text(text,
-              style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary))),
+              style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, fontWeight: FontWeight.w500))),
         ],
       ),
     );
   }
 
-  Widget _evidenceRow(String label, String value, {bool highlight = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: highlight ? AppTheme.navy : AppTheme.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: highlight ? AppTheme.navy : AppTheme.border,
-          width: 1.5,
+  Widget _evidenceRow(String label, String value, {bool highlight = false, bool isDeduction = false, bool isBold = false}) {
+    if (highlight) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [AppTheme.navy, Color(0xFF1E40AF)]),
+          borderRadius: BorderRadius.circular(8),
         ),
-      ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(label,
+                  style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.white, fontWeight: FontWeight.w600)),
+            ),
+            Text(value,
+                style: const TextStyle(fontSize: 20, fontWeight: AppTheme.numberWeight, color: AppTheme.white)),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             child: Text(label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: AppTheme.labelSize,
-                  color: highlight ? AppTheme.white : AppTheme.textPrimary,
-                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textSecondary,
+                  fontWeight: FontWeight.w500,
+                  height: 1.4,
                 )),
           ),
+          const SizedBox(width: 16),
           Text(value,
               style: TextStyle(
                 fontSize: AppTheme.bodyMin,
-                fontWeight: AppTheme.numberWeight,
-                color: highlight ? AppTheme.white : AppTheme.navy,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+                color: isDeduction ? AppTheme.red : AppTheme.navy,
                 letterSpacing: -0.5,
               )),
         ],
@@ -448,8 +574,8 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
   Widget _evidenceArrow() {
     return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 20),
-      child: Icon(Icons.arrow_downward_rounded, color: AppTheme.textSecondary, size: 18),
+      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 24),
+      child: Icon(Icons.arrow_downward_rounded, color: Colors.black26, size: 18),
     );
   }
 }
