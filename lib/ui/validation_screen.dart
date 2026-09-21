@@ -111,35 +111,35 @@ class _ValidationScreenState extends State<ValidationScreen> {
           const SizedBox(height: 32), // Expanded whitespace separating header from cards
 
           _buildCard(
-            label:       'Mukhya rashi',
+            label:       'लोन की रकम',
             sublabel:    'Principal Amount',
             controller:  _principalCtrl,
             fieldKey:    'principal',
             onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(principal_amount: double.tryParse(v))),
           ),
           _buildCard(
-            label:       'Avadhi (mahine mein)',
+            label:       'कितने महीने का लोन है?',
             sublabel:    'Tenure in Months',
             controller:  _monthsCtrl,
             fieldKey:    'months',
             onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(tenure_months: int.tryParse(v))),
           ),
           _buildCard(
-            label:       'Batayi gayi dar',
+            label:       'बताई गई ब्याज दर',
             sublabel:    'Advertised Flat Rate (%)',
             controller:  _flatRateCtrl,
             fieldKey:    'rate',
             onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(advertised_flat_rate: double.tryParse(v))),
           ),
           _buildCard(
-            label:       'Processing shulk',
+            label:       'प्रोसेसिंग फीस',
             sublabel:    'Upfront Processing Fee',
             controller:  _procFeeCtrl,
             fieldKey:    'fee',
             onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(upfront_processing_fee: double.tryParse(v))),
           ),
           _buildCard(
-            label:       'Maasik bima',
+            label:       'हर महीने का बीमा',
             sublabel:    'Monthly Insurance Premium',
             controller:  _insuranceCtrl,
             fieldKey:    'insurance',
@@ -162,7 +162,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
               backgroundColor: _allConfirmed ? AppTheme.green : AppTheme.border,
               foregroundColor: AppTheme.white,
             ),
-            child: const Text('Asli Sach Dekhein  (See Real Truth)'),
+            child: const Text('लोन का असली सच जानें  (See True Cost)'),
           ),
         ],
       ),
@@ -222,7 +222,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
                       ),
                       decoration: InputDecoration(
                         fillColor: confirmed ? const Color(0xFFF3F4F6) : AppTheme.white,
-                        hintText: confirmed ? 'Confirmed' : 'यहाँ टाइप करें…',
+                        hintText: confirmed ? '✓ सत्यापित' : 'यहाँ टाइप करें…',
                       ),
                       onChanged: onChanged,
                     ),
