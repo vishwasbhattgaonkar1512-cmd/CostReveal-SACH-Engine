@@ -280,15 +280,19 @@ class _InputScreenState extends State<InputScreen>
         elevation: 0,
 
         title: const Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.pie_chart_rounded, color: Colors.white, size: 20),
             SizedBox(width: 8),
-            Text(
-              'CostReveal',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+            Flexible(
+              child: Text(
+                'CostReveal',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -356,12 +360,13 @@ class _InputScreenState extends State<InputScreen>
 
                   final double textSpacing = compact ? 10 : 20;
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+                  return SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                         // ─────────────────────────────
                         // OFFLINE BADGE
                         // ─────────────────────────────
@@ -578,7 +583,7 @@ class _InputScreenState extends State<InputScreen>
                         ),
                       ],
                     ),
-                  );
+                  ));
                 },
               ),
             ),
