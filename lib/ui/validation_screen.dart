@@ -37,13 +37,23 @@ class _ValidationScreenState extends State<ValidationScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appState = Provider.of<AppProvider>(context, listen: false);
-      if (appState.candidateTerms != null) {
-        _principalCtrl.text = appState.candidateTerms!.principal_amount?.toString() ?? '';
-        _monthsCtrl.text    = appState.candidateTerms!.tenure_months?.toString() ?? '';
-        _flatRateCtrl.text  = appState.candidateTerms!.advertised_flat_rate?.toString() ?? '';
-        _procFeeCtrl.text   = appState.candidateTerms!.upfront_processing_fee?.toString() ?? '';
-        _insuranceCtrl.text = appState.candidateTerms!.monthly_insurance_premium?.toString() ?? '';
+      final candidate = Provider.of<AppProvider>(context, listen: false).candidateTerms;
+      if (candidate != null) {
+        if (candidate.principal_amount != null) {
+          _principalCtrl.text = candidate.principal_amount!.toString().replaceAll(RegExp(r'\.0$'), '');
+        }
+        if (candidate.tenure_months != null) {
+          _monthsCtrl.text = candidate.tenure_months!.toString();
+        }
+        if (candidate.advertised_flat_rate != null) {
+          _flatRateCtrl.text = candidate.advertised_flat_rate!.toString().replaceAll(RegExp(r'\.0$'), '');
+        }
+        if (candidate.upfront_processing_fee != null) {
+          _procFeeCtrl.text = candidate.upfront_processing_fee!.toString().replaceAll(RegExp(r'\.0$'), '');
+        }
+        if (candidate.monthly_insurance_premium != null) {
+          _insuranceCtrl.text = candidate.monthly_insurance_premium!.toString().replaceAll(RegExp(r'\.0$'), '');
+        }
       }
     });
   }
@@ -54,7 +64,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.bg,
-      appBar: AppBar(title: const Text('संख्याएँ जाँचें  (Verify Numbers)')),
+      appBar: AppBar(title: const Text('Numbers jaanch karein')),
       body: ListView(
         padding: const EdgeInsets.all(AppTheme.cardPadding),
         children: [
@@ -66,15 +76,15 @@ class _ValidationScreenState extends State<ValidationScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  _allConfirmed ? 'सब चेक हो गया ✓' : 'कृपया नंबर्स चेक करें',
+                  'कृपया नंबर्स चेक करें',
                   style: TextStyle(
                     fontSize: AppTheme.bodyMin,
-                    fontWeight: FontWeight.w700,
-                    color: _allConfirmed ? AppTheme.green : AppTheme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 Text(
-                  '$_confirmedCount/$_totalFields चेक हुआ',
+                  '$_confirmedCount/$_totalFields',
                   style: TextStyle(
                     fontSize: AppTheme.subheadline,
                     fontWeight: AppTheme.numberWeight,
@@ -87,6 +97,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
           ),
           const SizedBox(height: 12),
 
+          // Linear progress bar
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
@@ -97,47 +108,46 @@ class _ValidationScreenState extends State<ValidationScreen> {
             ),
           ),
 
+          const SizedBox(height: 32), // Expanded whitespace separating header from cards
+
+          _buildCard(
+            label:       'Mukhya rashi',
+            sublabel:    'Principal Amount',
+            controller:  _principalCtrl,
+            fieldKey:    'principal',
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(principal_amount: double.tryParse(v))),
+          ),
+          _buildCard(
+            label:       'Avadhi (mahine mein)',
+            sublabel:    'Tenure in Months',
+            controller:  _monthsCtrl,
+            fieldKey:    'months',
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(tenure_months: int.tryParse(v))),
+          ),
+          _buildCard(
+            label:       'Batayi gayi dar',
+            sublabel:    'Advertised Flat Rate (%)',
+            controller:  _flatRateCtrl,
+            fieldKey:    'rate',
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(advertised_flat_rate: double.tryParse(v))),
+          ),
+          _buildCard(
+            label:       'Processing shulk',
+            sublabel:    'Upfront Processing Fee',
+            controller:  _procFeeCtrl,
+            fieldKey:    'fee',
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(upfront_processing_fee: double.tryParse(v))),
+          ),
+          _buildCard(
+            label:       'Maasik bima',
+            sublabel:    'Monthly Insurance Premium',
+            controller:  _insuranceCtrl,
+            fieldKey:    'insurance',
+            onChanged:   (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(monthly_insurance_premium: double.tryParse(v))),
+          ),
+
           const SizedBox(height: 32),
 
-          _buildCard(
-            label:    'लोन की रकम',
-            sublabel: 'Principal Amount',
-            controller: _principalCtrl,
-            fieldKey: 'principal',
-            onChanged: (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(principal_amount: double.tryParse(v))),
-          ),
-          _buildCard(
-            label:    'कितने महीने का लोन है?',
-            sublabel: 'Tenure in Months',
-            controller: _monthsCtrl,
-            fieldKey: 'months',
-            onChanged: (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(tenure_months: int.tryParse(v))),
-          ),
-          _buildCard(
-            label:    'बताई गई ब्याज दर',
-            sublabel: 'Advertised Flat Rate (%)',
-            controller: _flatRateCtrl,
-            fieldKey: 'rate',
-            onChanged: (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(advertised_flat_rate: double.tryParse(v))),
-          ),
-          _buildCard(
-            label:    'प्रोसेसिंग फीस',
-            sublabel: 'Upfront Processing Fee',
-            controller: _procFeeCtrl,
-            fieldKey: 'fee',
-            onChanged: (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(upfront_processing_fee: double.tryParse(v))),
-          ),
-          _buildCard(
-            label:    'हर महीने का बीमा (इंश्योरेंस)',
-            sublabel: 'Monthly Insurance Premium',
-            controller: _insuranceCtrl,
-            fieldKey: 'insurance',
-            onChanged: (v) => appState.updateCandidateTerms((appState.candidateTerms ?? CandidateLoanTerms()).copyWith(monthly_insurance_premium: double.tryParse(v))),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Task 4: Big high-contrast CTA
           ElevatedButton(
             onPressed: _allConfirmed
                 ? () {
@@ -149,15 +159,10 @@ class _ValidationScreenState extends State<ValidationScreen> {
                   }
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _allConfirmed ? AppTheme.red : AppTheme.border,
+              backgroundColor: _allConfirmed ? AppTheme.green : AppTheme.border,
               foregroundColor: AppTheme.white,
-              minimumSize: const Size(double.infinity, 64),
             ),
-            child: const Text(
-              'लोन का असली सच जानें\nRECONSTRUCT TRUE COST',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, height: 1.4),
-            ),
+            child: const Text('Asli Sach Dekhein  (See Real Truth)'),
           ),
         ],
       ),
@@ -188,18 +193,22 @@ class _ValidationScreenState extends State<ValidationScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(label,
-                        style: TextStyle(
-                          fontSize: AppTheme.bodyMin,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary,
-                        )),
-                    const SizedBox(height: 2),
-                    Text(sublabel,
-                        style: TextStyle(
-                          fontSize: AppTheme.labelSize,
-                          color: AppTheme.textSecondary,
-                        )),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: AppTheme.bodyMin,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2), // Tighten gap for Gestalt grouping
+                    Text(
+                      sublabel,
+                      style: TextStyle(
+                        fontSize: AppTheme.labelSize,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: controller,
@@ -209,11 +218,11 @@ class _ValidationScreenState extends State<ValidationScreen> {
                         fontSize: AppTheme.subheadline,
                         fontWeight: AppTheme.numberWeight,
                         color: AppTheme.textPrimary,
-                        letterSpacing: -0.5,
+                        letterSpacing: -0.5, // Premium sleek numbers
                       ),
                       decoration: InputDecoration(
                         fillColor: confirmed ? const Color(0xFFF3F4F6) : AppTheme.white,
-                        hintText: confirmed ? '✓ सत्यापित' : 'यहाँ टाइप करें…',
+                        hintText: confirmed ? 'Confirmed' : 'Yahaan type karein...',
                       ),
                       onChanged: onChanged,
                     ),
@@ -221,6 +230,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
                 ),
               ),
               const SizedBox(width: 12),
+              // Tactile bouncing confirm target
               BouncingTouch(
                 onTap: () {
                   HapticFeedback.lightImpact();
@@ -251,3 +261,4 @@ class _ValidationScreenState extends State<ValidationScreen> {
     );
   }
 }
+

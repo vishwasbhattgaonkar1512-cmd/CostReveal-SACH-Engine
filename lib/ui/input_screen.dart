@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../bridge/sensor_handler.dart';
 import '../bridge/gemini_api.dart';
 import '../state/app_state.dart';
@@ -45,7 +45,7 @@ class _InputScreenState extends State<InputScreen>
     super.dispose();
   }
 
-  // â”€â”€ Voice Entry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Voice Entry ─────────────────────────────────────────────────────────
   Future<void> _onMicTap() async {
     if (_isListening || _isAiProcessing) return;
 
@@ -81,7 +81,7 @@ class _InputScreenState extends State<InputScreen>
       builder: (ctx) => AlertDialog(
         title: const Text(
           'आपने कहा:',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -102,7 +102,7 @@ class _InputScreenState extends State<InputScreen>
             ),
             const SizedBox(height: 12),
             const Text(
-              'आपकी लोन जानकारी तैयार की जा रही है…\nकृपया नीचे विवरण जाँचें।',
+              'Abhi Gemini parsing pending hai.\nValidation screen par manually numbers darj karein.',
               style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
           ],
@@ -110,7 +110,7 @@ class _InputScreenState extends State<InputScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('वापस जाएं'),
+            child: const Text('Wapas jayein'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -149,14 +149,14 @@ class _InputScreenState extends State<InputScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E3A8A),
             ),
-            child: const Text('विवरण जाँचें'),
+            child: const Text('Validation Screen'),
           ),
         ],
       ),
     );
   }
 
-  // â”€â”€ Camera Entry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Camera Entry ─────────────────────────────────────────────────────────
   Future<void> _onCameraTap() async {
     if (_isCapturing || _isAiProcessing) return;
 
@@ -221,8 +221,8 @@ class _InputScreenState extends State<InputScreen>
         actions: [
           Row(
             children: [
-              const Text('Demo Mode',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('डेमो मोड',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               Switch(
                 value: _isDemoMode,
                 activeThumbColor: Colors.amber,
@@ -268,14 +268,14 @@ class _InputScreenState extends State<InputScreen>
                 ),
               ),
               const Text(
-                'लोन का असली सच जानें।',
+                'Loan ki sacchai jaaniye.',
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
 
               const Spacer(),
 
-              // â”€â”€ HERO: Pulsing/Listening Mic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── HERO: Pulsing/Listening Mic ────────────────────────────
               Center(
                 child: GestureDetector(
                   onTap: _onMicTap,
@@ -318,7 +318,7 @@ class _InputScreenState extends State<InputScreen>
               const SizedBox(height: 16),
               Text(
                 _isListening
-                    ? 'सुन रहा हूँ… (Listening…)'
+                    ? 'Sun raha hoon... (Listening...)'
                     : 'बोल कर बताएं',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -333,7 +333,7 @@ class _InputScreenState extends State<InputScreen>
               const Spacer(),
 
               const Text(
-                'या खुद भरें:',
+                'Ya khud select karein:',
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -341,7 +341,7 @@ class _InputScreenState extends State<InputScreen>
               ),
               const SizedBox(height: 12),
 
-              // â”€â”€ Secondary: Camera + Manual chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // ── Secondary: Camera + Manual chips ─────────────────────────
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -350,13 +350,13 @@ class _InputScreenState extends State<InputScreen>
                       icon: _isCapturing
                           ? Icons.hourglass_top_rounded
                           : Icons.camera_alt_rounded,
-                      label: _isCapturing ? 'फोटो स्कैन हो रही है…' : 'KFS की फोटो लें',
+                      label: _isCapturing ? 'Capturing...' : 'KFS Photo Lein',
                       onTap: _onCameraTap,
                     ),
                     const SizedBox(width: 12),
                     _buildChip(
                       icon: Icons.edit_rounded,
-                      label: 'खुद टाइप करें',
+                      label: 'Manual Entry',
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -378,7 +378,7 @@ class _InputScreenState extends State<InputScreen>
                   minimumSize: const Size(double.infinity, 60),
                 ),
                 child: const Text(
-                  'लोन की डिटेल्स चेक करें',
+                  'Haath se darj karein  (Manual Entry)',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -418,5 +418,4 @@ class _InputScreenState extends State<InputScreen>
     );
   }
 }
-
 

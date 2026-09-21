@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -61,7 +61,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
     final calc  = state.calculationResult;
 
     if (terms == null || calc == null) {
-      return const Scaffold(body: Center(child: Text('à¤•à¥‹à¤ˆ à¤¡à¥‡à¤Ÿà¤¾ à¤¨à¤¹à¥€à¤‚à¥¤')));
+      return const Scaffold(body: Center(child: Text('कोई डेटा नहीं।')));
     }
 
     final advertisedInstalment = terms.principal_amount / terms.tenure_months +
@@ -84,14 +84,14 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
     final double maxY        = redSpots.last.y * 1.1;
     final double schoolMonths = calc.total_hidden_cost / 3200;
+    final patternCount = [true, terms.upfront_processing_fee > 0, terms.monthly_insurance_premium > 0].where((e) => e).length;
 
     return Scaffold(
       backgroundColor: AppTheme.bg,
-      appBar: AppBar(title: const Text('à¤…à¤¸à¤²à¥€ à¤¸à¤š  (Asli Sach)')),
+      appBar: AppBar(title: const Text('असली सच  (Asli Sach)')),
       body: ListView(
         padding: const EdgeInsets.all(AppTheme.cardPadding),
         children: [
-          // â”€â”€ Hero stat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: AppTheme.cardPadding),
             decoration: AppTheme.heroStatDecoration(AppTheme.red),
@@ -107,7 +107,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                   ),
                 ),
                 const Text(
-                  'à¤†à¤ª à¤ªà¤° à¤‡à¤¤à¤¨à¤¾ à¤¬à¥‹à¤ à¤¹à¥ˆ  (True APR)',
+                  'आप पर इतना बोझ है  (True APR)',
                   style: TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.white),
                   textAlign: TextAlign.center,
                 ),
@@ -117,9 +117,8 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
           const SizedBox(height: 16),
 
-          // â”€â”€ Chart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           const Text(
-            'à¤†à¤ªà¤•à¥‹ à¤•à¥à¤² à¤•à¤¿à¤¤à¤¨à¤¾ à¤¦à¥‡à¤¨à¤¾ à¤¹à¥‹à¤—à¤¾?  (Total repayment over time)',
+            'आपको कुल कितना देना होगा?  (Total repayment over time)',
             style: TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
             textAlign: TextAlign.center,
           ),
@@ -159,7 +158,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                   betweenBarsData: vRed.isNotEmpty
                       ? [BetweenBarsData(
                           fromIndex: 0, toIndex: 1,
-                          color: AppTheme.red.withValues(alpha: 0.12),
+                          color: AppTheme.red.withOpacity(0.12),
                         )]
                       : [],
                 ));
@@ -169,26 +168,24 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
           const SizedBox(height: 8),
 
-          // â”€â”€ Legend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _legendItem(AppTheme.green, 'à¤œà¥‹ à¤¬à¤¤à¤¾à¤¯à¤¾ à¤¥à¤¾  (Promised)', dashed: false),
+              _legendItem(AppTheme.green, 'जो बताया था  (Promised)', dashed: false),
               const SizedBox(width: 24),
-              _legendItem(AppTheme.red,   'à¤…à¤¸à¤²à¥€ à¤¸à¤š  (True Cost)', dashed: true),
+              _legendItem(AppTheme.red,   'असली सच  (True Cost)', dashed: true),
             ],
           ),
 
           const SizedBox(height: 24),
 
-          // â”€â”€ Emotional bomb â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
             padding: const EdgeInsets.all(AppTheme.cardPadding),
             decoration: AppTheme.cardDecoration(borderColor: AppTheme.red),
             child: Column(
               children: [
                 Text(
-                  'â‚¹${calc.total_hidden_cost.toStringAsFixed(0)} à¤•à¤¾ à¤¨à¥à¤•à¤¸à¤¾à¤¨',
+                  '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
                   style: const TextStyle(
                     fontSize: 24, fontWeight: AppTheme.numberWeight,
                     color: AppTheme.red, letterSpacing: -0.5,
@@ -196,18 +193,18 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                   textAlign: TextAlign.center,
                 ),
                 Text(
-                  'Loss of â‚¹${calc.total_hidden_cost.toStringAsFixed(0)}',
+                  'Loss of ₹${calc.total_hidden_cost.toStringAsFixed(0)}',
                   style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.red),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'à¤®à¤¤à¤²à¤¬ ${schoolMonths.toStringAsFixed(1)} à¤®à¤¹à¥€à¤¨à¥‡ à¤•à¥€ à¤¸à¥à¤•à¥‚à¤² à¤«à¥€à¤¸!',
+                  'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
                   style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary),
                   textAlign: TextAlign.center,
                 ),
                 Text(
-                  '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark â‚¹3,200)',
+                  '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark ₹3,200)',
                   style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
                   textAlign: TextAlign.center,
                 ),
@@ -217,37 +214,35 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
           const SizedBox(height: 16),
 
-          // â”€â”€ Task 5-C: "What Changed the Cost?" Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           const Text(
-            'à¤®à¤¹à¤à¤—à¤¾ à¤•à¥à¤¯à¥‹à¤‚ à¤¹à¥à¤†?  (What Changed the Cost?)',
+            'महंगा क्यों हुआ?  (What Changed the Cost?)',
             style: TextStyle(fontSize: AppTheme.bodyMin, fontWeight: FontWeight.bold, color: AppTheme.navy),
           ),
           const SizedBox(height: 12),
           
           _costChangeCard(
-            title: 'à¤«à¥à¤²à¥ˆà¤Ÿ à¤°à¥‡à¤Ÿ (Flat Rate)',
+            title: 'फ्लैट रेट (Flat Rate)',
             subtitle: 'Interest charged on full amount, not remaining balance.',
             impact: 'Double interest burden',
             icon: Icons.percent_rounded,
           ),
           if (terms.upfront_processing_fee > 0)
             _costChangeCard(
-              title: 'à¤ªà¥à¤°à¥‹à¤¸à¥‡à¤¸à¤¿à¤‚à¤— à¤«à¥€à¤¸ (Processing Fee)',
-              subtitle: 'â‚¹${terms.upfront_processing_fee.toStringAsFixed(0)} deducted upfront before you even get the money.',
+              title: 'प्रोसेसिंग फीस (Processing Fee)',
+              subtitle: '₹${terms.upfront_processing_fee.toStringAsFixed(0)} deducted upfront before you even get the money.',
               impact: 'Reduces money in hand',
               icon: Icons.money_off_rounded,
             ),
           if (terms.monthly_insurance_premium > 0)
             _costChangeCard(
-              title: 'à¤¬à¥€à¤®à¤¾ (Insurance)',
-              subtitle: 'â‚¹${terms.monthly_insurance_premium.toStringAsFixed(0)} extra taken from you every month.',
+              title: 'बीमा (Insurance)',
+              subtitle: '₹${terms.monthly_insurance_premium.toStringAsFixed(0)} extra taken from you every month.',
               impact: 'Increases EMI artificially',
               icon: Icons.health_and_safety_rounded,
             ),
 
           const SizedBox(height: 16),
 
-          // â”€â”€ Task 5-B: Cost-Affecting Patterns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Container(
             padding: const EdgeInsets.all(AppTheme.cardPadding),
             decoration: AppTheme.cardDecoration(borderColor: const Color(0xFFF59E0B)),
@@ -255,20 +250,20 @@ class _TrueCostScreenState extends State<TrueCostScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'à¤²à¥‹à¤¨ à¤•à¥‹ à¤®à¤¹à¤à¤—à¤¾ à¤¬à¤¨à¤¾à¤¨à¥‡ à¤µà¤¾à¤²à¥‡ à¤•à¤¾à¤°à¤£  (COST-AFFECTING PATTERNS)',
+                  'लोन को महंगा बनाने वाले कारण  (COST-AFFECTING PATTERNS)',
                   style: TextStyle(
                     fontSize: AppTheme.labelSize, fontWeight: FontWeight.w900,
                     color: Color(0xFFF59E0B), letterSpacing: 0.5,
                   ),
                 ),
                 const SizedBox(height: 12),
-                _patternRow('à¤«à¥à¤²à¥ˆà¤Ÿ à¤°à¥‡à¤Ÿ (Flat Rate) à¤•à¤¾ à¤à¤¾à¤‚à¤¸à¤¾  (Flat-rate presentation)'),
-                _patternRow('à¤ªà¥ˆà¤¸à¥‡ à¤ªà¤¹à¤²à¥‡ à¤¹à¥€ à¤•à¤¾à¤Ÿ à¤²à¥‡à¤¨à¤¾  (Upfront deduction)'),
-                _patternRow('à¤œà¤¬à¤°à¤¦à¤¸à¥à¤¤à¥€ à¤•à¤¾ à¤‡à¤‚à¤¶à¥à¤¯à¥‹à¤°à¥‡à¤‚à¤¸  (Insurance-related cost)'),
+                _patternRow('फ्लैट रेट (Flat Rate) का झांसा  (Flat-rate presentation)'),
+                _patternRow('पैसे पहले ही काट लेना  (Upfront deduction)'),
+                _patternRow('ज़बरदस्ती का इंश्योरेंस  (Insurance-related cost)'),
                 const SizedBox(height: 8),
-                const Text(
-                  '3 cost-affecting patterns detected',
-                  style: TextStyle(
+                Text(
+                  '$patternCount cost-affecting patterns detected',
+                  style: const TextStyle(
                     fontSize: AppTheme.labelSize, fontWeight: FontWeight.bold,
                     color: AppTheme.textSecondary,
                   ),
@@ -279,7 +274,6 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
           const SizedBox(height: 16),
 
-          // â”€â”€ Task 5-A: Evidence Trace Expander â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           GestureDetector(
             onTap: () => setState(() => _evidenceExpanded = !_evidenceExpanded),
             child: Container(
@@ -292,7 +286,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'à¤¹à¤®à¤¨à¥‡ à¤¯à¤¹ à¤•à¥ˆà¤¸à¥‡ à¤¹à¤¿à¤¸à¤¾à¤¬ à¤²à¤—à¤¾à¤¯à¤¾?\n(How did we calculate this?)',
+                        'हमने यह कैसे हिसाब लगाया?\n(How did we calculate this?)',
                         style: TextStyle(
                           fontSize: AppTheme.bodyMin,
                           fontWeight: FontWeight.w700,
@@ -307,25 +301,25 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                   ),
                   if (_evidenceExpanded) ...[
                     const SizedBox(height: 16),
-                    _evidenceRow('à¤²à¥‹à¤¨ à¤•à¥€ à¤°à¤•à¤®  (Sanctioned Amount)',
-                        'â‚¹${terms.principal_amount.toStringAsFixed(0)}'),
+                    _evidenceRow('लोन की रकम  (Sanctioned Amount)',
+                        '₹${calc.sanctioned_amount.toStringAsFixed(0)}'),
                     _evidenceArrow(),
-                    _evidenceRow('à¤ªà¥à¤°à¥‹à¤¸à¥‡à¤¸à¤¿à¤‚à¤— à¤«à¥€à¤¸  (Processing Fee)',
-                        'â‚¹${terms.upfront_processing_fee.toStringAsFixed(0)}'),
+                    _evidenceRow('प्रोसेसिंग फीस  (Processing Fee)',
+                        '₹${calc.processing_fee.toStringAsFixed(0)}'),
                     _evidenceArrow(),
-                    _evidenceRow('à¤‡à¤‚à¤¶à¥à¤¯à¥‹à¤°à¥‡à¤‚à¤¸ à¤•à¤¾ à¤–à¤°à¥à¤šà¤¾  (Insurance Cost)',
-                        'â‚¹${(terms.monthly_insurance_premium * terms.tenure_months).toStringAsFixed(0)}'),
+                    _evidenceRow('इंश्योरेंस का खर्चा  (Insurance Cost)',
+                        '₹${calc.insurance_cost.toStringAsFixed(0)}/month'),
                     _evidenceArrow(),
-                    _evidenceRow('à¤¹à¤¾à¤¥ à¤®à¥‡à¤‚ à¤•à¤¿à¤¤à¤¨à¥‡ à¤ªà¥ˆà¤¸à¥‡ à¤†à¤  (Net Amount Received)',
-                        'â‚¹${calc.net_disbursed_amount.toStringAsFixed(0)}'),
+                    _evidenceRow('हाथ में कितने पैसे आए  (Net Amount Received)',
+                        '₹${calc.net_disbursed_amount.toStringAsFixed(0)}'),
                     _evidenceArrow(),
-                    _evidenceRow('à¤¹à¤° à¤®à¤¹à¥€à¤¨à¥‡ à¤•à¥€ à¤•à¤¿à¤¶à¥à¤¤  (Monthly Cash Flow)',
-                        'â‚¹${calc.actual_monthly_outflow.toStringAsFixed(0)}/month'),
+                    _evidenceRow('हर महीने की किश्त  (Monthly Cash Flow)',
+                        '₹${calc.actual_monthly_outflow.toStringAsFixed(0)}/month'),
                     _evidenceArrow(),
-                    _evidenceRow('à¤®à¤¹à¥€à¤¨à¥‡ à¤•à¤¾ à¤¬à¥à¤¯à¤¾à¤œ à¤¦à¤°  (Monthly IRR)',
-                        '${(calc.true_apr / 12).toStringAsFixed(2)}%'),
+                    _evidenceRow('महीने का ब्याज दर  (Monthly IRR)',
+                        '${calc.monthly_irr.toStringAsFixed(2)}%'),
                     _evidenceArrow(),
-                    _evidenceRow('à¤¸à¤¾à¤² à¤•à¤¾ à¤…à¤¸à¤²à¥€ à¤¬à¥à¤¯à¤¾à¤œ à¤¦à¤°  (Effective Annualized Cost)',
+                    _evidenceRow('साल का असली ब्याज दर  (Effective Annualized Cost)',
                         '${calc.true_apr.toStringAsFixed(2)}%',
                         highlight: true),
                   ],
@@ -340,15 +334,14 @@ class _TrueCostScreenState extends State<TrueCostScreen>
             onPressed: () => Navigator.push(
                 context, MaterialPageRoute(builder: (_) => const RbiDraftScreen())),
             style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.navy, foregroundColor: AppTheme.white),
-            child: const Text('à¤…à¤ªà¤¨à¥€ à¤°à¤¿à¤ªà¥‹à¤°à¥à¤Ÿ à¤¦à¥‡à¤–à¥‡à¤‚  (Review Your Result)'),
+                backgroundColor: AppTheme.navy, foregroundColor: AppTheme.white,
+                minimumSize: const Size(double.infinity, 60)),
+            child: const Text('अपनी रिपोर्ट देखें  (Review Your Result)'),
           ),
         ],
       ),
     );
   }
-
-  // â”€â”€ Helper Widgets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Widget _costChangeCard({required String title, required String subtitle, required String impact, required IconData icon}) {
     return Container(
@@ -365,7 +358,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.red.withValues(alpha: 0.1),
+              color: AppTheme.red.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: AppTheme.red, size: 24),
@@ -379,7 +372,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                 const SizedBox(height: 4),
                 Text(subtitle, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
                 const SizedBox(height: 6),
-                Text('âš ï¸ $impact', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.red)),
+                Text('⚠️ $impact', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.red)),
               ],
             ),
           ),
@@ -491,4 +484,3 @@ class _LinePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-

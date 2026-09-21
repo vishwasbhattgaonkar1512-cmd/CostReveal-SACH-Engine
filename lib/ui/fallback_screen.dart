@@ -1,5 +1,4 @@
-﻿import 'package:flutter/material.dart';
-import 'input_screen.dart';
+import 'package:flutter/material.dart';
 import 'validation_screen.dart';
 
 /// Screen 5: Global Fallback / Offline Resilience
@@ -21,7 +20,7 @@ class _FallbackScreenState extends State<FallbackScreen> {
     super.initState();
     _failureCount++;
 
-    // Auto-route back to manual mode after 3 seconds â€” zero panic
+    // Auto-route back to manual mode after 3 seconds — zero panic
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -50,7 +49,7 @@ class _FallbackScreenState extends State<FallbackScreen> {
               ),
               const SizedBox(height: 32),
               const Text(
-                'इंटरनेट नहीं चल रहा है।',
+                'AI Network Unavailable.',
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -60,7 +59,7 @@ class _FallbackScreenState extends State<FallbackScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'आपकी डिटेल्स सुरक्षित हैं।\nआप बिना इंटरनेट के भी इसे इस्तेमाल कर सकते हैं।',
+                'Routing to Secure Manual.',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black54,
@@ -74,12 +73,12 @@ class _FallbackScreenState extends State<FallbackScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'अब आप खुद डिटेल्स डाल सकते हैं… (Routing to Manual Entry…)',
+                'Redirecting to manual entry...',
                 style: TextStyle(fontSize: 13, color: Colors.black45),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 64),
-              // Debug info for judges â€” silent counter surfaced on this screen only
+              // Debug info for judges — silent counter surfaced on this screen only
               Text(
                 'Recovered $_failureCount time${_failureCount == 1 ? '' : 's'} this session.',
                 style: const TextStyle(fontSize: 12, color: Colors.black26),
@@ -92,5 +91,3 @@ class _FallbackScreenState extends State<FallbackScreen> {
     );
   }
 }
-
-
