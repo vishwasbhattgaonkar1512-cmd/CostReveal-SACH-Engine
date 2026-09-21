@@ -1,8 +1,8 @@
-﻿import 'dart:io';
+﻿
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
+
 import '../state/app_state.dart';
 import '../engine/pdf_generator.dart';
 import '../utils/formatters.dart';
@@ -135,17 +135,7 @@ class RbiDraftScreen extends StatelessWidget {
                     result: result,
                   );
                   
-                  final tempDir = await getTemporaryDirectory();
-                  final file = File('${tempDir.path}/LoanTransparencyReport.pdf');
-                  await file.writeAsBytes(pdfBytes);
-                  
-                  await SharePlus.instance.share(
-                    ShareParams(
-                      files: [XFile(file.path)],
-                      subject: 'LoanKaSach â€” Loan Transparency Report',
-                      text: 'Please find attached the Loan Transparency Report.',
-                    ),
-                  );
+                  final xFile = XFile.fromData(pdfBytes, mimeType: 'application/pdf', name: 'CoastReveal_Report.pdf'); await Share.shareXFiles([xFile], subject: 'CoastReveal - Loan Transparency Report', text: 'Please find attached the Loan Transparency Report.');
                 } catch (e) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -208,6 +198,9 @@ class RbiDraftScreen extends StatelessWidget {
     );
   }
 }
+
+
+
 
 
 

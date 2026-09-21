@@ -1,4 +1,4 @@
-// lib/state/app_state.dart
+﻿// lib/state/app_state.dart
 // ============================================================================
 // CostReveal: The Dirty Tricks Detector
 // Application State Management - Provider Pattern
@@ -9,14 +9,14 @@
 // complete workflow:
 //
 // WORKFLOW STATES:
-// 1. IDLE → No data yet
-// 2. AI_EXTRACTED → CandidateLoanTerms available (UNTRUSTED)
-// 3. HUMAN_VALIDATED → ConfirmedLoanTerms available (TRUSTED)
-// 4. CALCULATED → CalculationResult available (MATHEMATICAL TRUTH)
-// 5. PDF_GENERATED → Evidence document ready for submission
+// 1. IDLE ΓåÆ No data yet
+// 2. AI_EXTRACTED ΓåÆ CandidateLoanTerms available (UNTRUSTED)
+// 3. HUMAN_VALIDATED ΓåÆ ConfirmedLoanTerms available (TRUSTED)
+// 4. CALCULATED ΓåÆ CalculationResult available (MATHEMATICAL TRUTH)
+// 5. PDF_GENERATED ΓåÆ Evidence document ready for submission
 //
 // STATE TRANSITIONS (ONE-WAY, FORWARD ONLY):
-// IDLE → AI_EXTRACTED → HUMAN_VALIDATED → CALCULATED → PDF_GENERATED
+// IDLE ΓåÆ AI_EXTRACTED ΓåÆ HUMAN_VALIDATED ΓåÆ CALCULATED ΓåÆ PDF_GENERATED
 //
 // CRITICAL INVARIANT:
 // Math engine can ONLY access ConfirmedLoanTerms (never CandidateLoanTerms).
@@ -54,7 +54,7 @@ class AppProvider extends ChangeNotifier {
   /// Current workflow state
   AppState _currentState = AppState.idle;
 
-  /// Stores the Base64 image from M3's camera bridge.
+  /// M3 Camera Bridge: stores Base64 image awaiting Gemini extraction
   String? pendingCameraImage;
 
   void setPendingCameraImage(String base64) {
@@ -121,7 +121,7 @@ class AppProvider extends ChangeNotifier {
   bool get hasPDF => _generatedPDF != null;
 
   // ==========================================================================
-  // STATE TRANSITION: IDLE → AI_EXTRACTED
+  // STATE TRANSITION: IDLE ΓåÆ AI_EXTRACTED
   // ==========================================================================
 
   /// Set candidate loan terms from AI extraction.
@@ -134,7 +134,7 @@ class AppProvider extends ChangeNotifier {
   ///
   /// [terms] The extracted loan terms (may have null fields)
   ///
-  /// State Transition: IDLE → AI_EXTRACTED
+  /// State Transition: IDLE ΓåÆ AI_EXTRACTED
   void setCandidateTerms(CandidateLoanTerms terms) {
     _candidateTerms = terms;
     _currentState = AppState.aiExtracted;
@@ -161,7 +161,7 @@ class AppProvider extends ChangeNotifier {
   }
 
   // ==========================================================================
-  // STATE TRANSITION: AI_EXTRACTED → HUMAN_VALIDATED
+  // STATE TRANSITION: AI_EXTRACTED ΓåÆ HUMAN_VALIDATED
   // ==========================================================================
 
   /// Validate and confirm candidate terms (CROSSING THE TRUST BOUNDARY).
@@ -182,7 +182,7 @@ class AppProvider extends ChangeNotifier {
   ///
   /// Returns: true if validation succeeded, false otherwise
   ///
-  /// State Transition: AI_EXTRACTED → HUMAN_VALIDATED (if valid)
+  /// State Transition: AI_EXTRACTED ΓåÆ HUMAN_VALIDATED (if valid)
   bool validateAndConfirmTerms() {
     // Precondition: Must have candidate terms
     if (_candidateTerms == null) {
@@ -216,12 +216,12 @@ class AppProvider extends ChangeNotifier {
 
   /// Manually set confirmed terms (for testing or manual entry).
   ///
-  /// This bypasses the candidate→confirmed flow and directly sets trusted data.
+  /// This bypasses the candidateΓåÆconfirmed flow and directly sets trusted data.
   /// Use this when data is entered manually by a human (not from AI extraction).
   ///
   /// [terms] Pre-validated confirmed terms
   ///
-  /// State Transition: ANY → HUMAN_VALIDATED
+  /// State Transition: ANY ΓåÆ HUMAN_VALIDATED
   void setConfirmedTerms(ConfirmedLoanTerms terms) {
     _confirmedTerms = terms;
     _currentState = AppState.humanValidated;
@@ -235,7 +235,7 @@ class AppProvider extends ChangeNotifier {
   }
 
   // ==========================================================================
-  // STATE TRANSITION: HUMAN_VALIDATED → CALCULATED
+  // STATE TRANSITION: HUMAN_VALIDATED ΓåÆ CALCULATED
   // ==========================================================================
 
   /// Calculate TRUE APR and expose predatory lending traps.
@@ -249,7 +249,7 @@ class AppProvider extends ChangeNotifier {
   ///
   /// Returns: true if calculation succeeded, false otherwise
   ///
-  /// State Transition: HUMAN_VALIDATED → CALCULATED
+  /// State Transition: HUMAN_VALIDATED ΓåÆ CALCULATED
   bool calculateTrueAPR() {
     // Precondition: Must have confirmed terms
     if (_confirmedTerms == null) {
@@ -286,7 +286,7 @@ class AppProvider extends ChangeNotifier {
   }
 
   // ==========================================================================
-  // STATE TRANSITION: CALCULATED → PDF_GENERATED
+  // STATE TRANSITION: CALCULATED ΓåÆ PDF_GENERATED
   // ==========================================================================
 
   /// Generate PDF evidence document.
@@ -307,7 +307,7 @@ class AppProvider extends ChangeNotifier {
   ///
   /// Returns: true if PDF generated successfully, false otherwise
   ///
-  /// State Transition: CALCULATED → PDF_GENERATED
+  /// State Transition: CALCULATED ΓåÆ PDF_GENERATED
   Future<bool> generatePDFEvidence({
     String? borrowerName,
     String? lenderName,
@@ -364,7 +364,7 @@ class AppProvider extends ChangeNotifier {
   /// This is used when starting a new loan analysis or when the user
   /// wants to discard current work and start over.
   ///
-  /// State Transition: ANY → IDLE
+  /// State Transition: ANY ΓåÆ IDLE
   void reset() {
     _currentState = AppState.idle;
     _candidateTerms = null;
@@ -460,3 +460,4 @@ extension AppStateExtension on AppState {
     }
   }
 }
+
