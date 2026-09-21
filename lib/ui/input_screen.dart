@@ -217,7 +217,13 @@ class _InputScreenState extends State<InputScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CoastReveal'),
+        title: const Row(
+          children: [
+            Icon(Icons.pie_chart_rounded, color: Colors.white),
+            SizedBox(width: 8),
+            Text('CostReveal'),
+          ],
+        ),
         actions: [
           Row(
             children: [

@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'CoastReveal',
+      title: 'CostReveal',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF9F9F9), // True White/Off-white for Mumbai Sunlight
         primaryColor: const Color(0xFF1E3A8A), // Government Navy
