@@ -66,7 +66,7 @@ class MathEngine {
   // PUBLIC API: THE TRUTH REVEALER
   // ============================================================================
 
-  /// Expose the truth about a predatory loan.
+   /// Expose the truth about a predatory loan.
   ///
   /// This is the ONLY public method. It orchestrates the complete analysis:
   /// 1. Deconstruct the advertised terms
@@ -81,6 +81,7 @@ class MathEngine {
   /// - total_hidden_cost: How much extra the borrower pays vs fair loan
   /// - actual_monthly_outflow: Real cash leaving borrower's pocket each month
   /// - net_disbursed_amount: Actual cash borrower receives (after fee deduction)
+  /// - PLUS all evidence trace data for UI expander (Task 1)
   ///
   /// This method is deterministic: same input ALWAYS produces same output.
   CalculationResult exposeTheTruth(ConfirmedLoanTerms terms) {
@@ -124,14 +125,21 @@ class MathEngine {
     );
 
     // Step 7: Package the truth for human consumption
+    // Now includes ALL evidence trace data for UI expander (Task 1)
     return CalculationResult(
+      // Core outputs
       true_apr: trueAPR,
       total_hidden_cost: hiddenCost,
       actual_monthly_outflow: actualMonthlyOutflow,
       net_disbursed_amount: netDisbursed,
+      // Evidence trace data (Task 1)
+      sanctioned_amount: terms.principal_amount,
+      processing_fee: terms.upfront_processing_fee,
+      insurance_cost: terms.monthly_insurance_premium,
+      monthly_cash_flows: List.unmodifiable(cashFlows), // Immutable list
+      monthly_irr: monthlyIRR * 100, // Convert to percentage
     );
   }
-
   // ============================================================================
   // TRAP 1: FLAT RATE DECEPTION CALCULATOR
   // ============================================================================

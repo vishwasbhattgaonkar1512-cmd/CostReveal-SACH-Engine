@@ -353,12 +353,19 @@ class ConfirmedLoanTerms {
 /// Trust Level: MATHEMATICAL CERTAINTY
 /// Source: MathEngine.exposeTheTruth()
 /// Next Step: PDF generation and RBI submission
+///
+/// EVIDENCE TRACE DATA:
+/// This class now exposes ALL intermediate calculation values needed
+/// for the "How did we calculate this?" evidence expander in the UI.
 /// ============================================================================
 @immutable
 class CalculationResult {
+  // ========== CORE OUTPUT FIELDS (Original) ==========
+  
   /// The TRUE Annual Percentage Rate (APR) calculated using IRR
   /// This is what the borrower ACTUALLY pays, not the advertised rate
   /// Example: Advertised 12% might be TRUE 24.5% APR
+  /// UI Label: "Effective Annualized Cost"
   final double true_apr;
 
   /// Total hidden cost = (Total actual paid) - (Principal + Fair interest)
@@ -371,13 +378,48 @@ class CalculationResult {
 
   /// Net amount actually received by borrower = Principal - Upfront fees
   /// TRAP: Borrower pays EMI on principal, but receives LESS
+  /// UI Label: "Net Amount Received"
   final double net_disbursed_amount;
 
+  // ========== EVIDENCE TRACE FIELDS (Task 1) ==========
+  
+  /// Sanctioned loan amount (before any deductions)
+  /// This is the principal amount in the loan agreement
+  /// UI Label: "Sanctioned Amount"
+  final double sanctioned_amount;
+
+  /// Upfront processing fee deducted from disbursement
+  /// UI Label: "Processing Fee"
+  final double processing_fee;
+
+  /// Monthly insurance/membership premium charged
+  /// UI Label: "Insurance Cost" (monthly)
+  final double insurance_cost;
+
+  /// Complete cash flow timeline used for IRR calculation
+  /// Month 0 = -net_disbursed_amount (negative = money received)
+  /// Months 1-N = +actual_monthly_outflow (positive = money paid)
+  /// UI Label: "Monthly Cash Flows"
+  final List<double> monthly_cash_flows;
+
+  /// Monthly Internal Rate of Return (as percentage)
+  /// This is the monthly interest rate that makes NPV = 0
+  /// Multiply by 12 to get true_apr
+  /// UI Label: "Monthly IRR"
+  final double monthly_irr;
+
   const CalculationResult({
+    // Core outputs
     required this.true_apr,
     required this.total_hidden_cost,
     required this.actual_monthly_outflow,
     required this.net_disbursed_amount,
+    // Evidence trace data
+    required this.sanctioned_amount,
+    required this.processing_fee,
+    required this.insurance_cost,
+    required this.monthly_cash_flows,
+    required this.monthly_irr,
   });
 
   /// Convert to JSON (for persistence/API)
@@ -387,6 +429,11 @@ class CalculationResult {
       'total_hidden_cost': total_hidden_cost,
       'actual_monthly_outflow': actual_monthly_outflow,
       'net_disbursed_amount': net_disbursed_amount,
+      'sanctioned_amount': sanctioned_amount,
+      'processing_fee': processing_fee,
+      'insurance_cost': insurance_cost,
+      'monthly_cash_flows': monthly_cash_flows,
+      'monthly_irr': monthly_irr,
     };
   }
 
@@ -397,6 +444,13 @@ class CalculationResult {
       total_hidden_cost: json['total_hidden_cost'] as double,
       actual_monthly_outflow: json['actual_monthly_outflow'] as double,
       net_disbursed_amount: json['net_disbursed_amount'] as double,
+      sanctioned_amount: json['sanctioned_amount'] as double,
+      processing_fee: json['processing_fee'] as double,
+      insurance_cost: json['insurance_cost'] as double,
+      monthly_cash_flows: (json['monthly_cash_flows'] as List<dynamic>)
+          .map((e) => e as double)
+          .toList(),
+      monthly_irr: json['monthly_irr'] as double,
     );
   }
 
@@ -408,6 +462,11 @@ class CalculationResult {
         '  Hidden Cost: ₹${total_hidden_cost.toStringAsFixed(2)}\n'
         '  Monthly Outflow: ₹${actual_monthly_outflow.toStringAsFixed(2)}\n'
         '  Net Disbursed: ₹${net_disbursed_amount.toStringAsFixed(2)}\n'
+        '  Sanctioned: ₹${sanctioned_amount.toStringAsFixed(2)}\n'
+        '  Processing Fee: ₹${processing_fee.toStringAsFixed(2)}\n'
+        '  Insurance: ₹${insurance_cost.toStringAsFixed(2)}/mo\n'
+        '  Monthly IRR: ${monthly_irr.toStringAsFixed(4)}%\n'
+        '  Cash Flows: ${monthly_cash_flows.length} months\n'
         ')';
   }
 
@@ -418,7 +477,12 @@ class CalculationResult {
         other.true_apr == true_apr &&
         other.total_hidden_cost == total_hidden_cost &&
         other.actual_monthly_outflow == actual_monthly_outflow &&
-        other.net_disbursed_amount == net_disbursed_amount;
+        other.net_disbursed_amount == net_disbursed_amount &&
+        other.sanctioned_amount == sanctioned_amount &&
+        other.processing_fee == processing_fee &&
+        other.insurance_cost == insurance_cost &&
+        listEquals(other.monthly_cash_flows, monthly_cash_flows) &&
+        other.monthly_irr == monthly_irr;
   }
 
   @override
@@ -428,6 +492,11 @@ class CalculationResult {
       total_hidden_cost,
       actual_monthly_outflow,
       net_disbursed_amount,
+      sanctioned_amount,
+      processing_fee,
+      insurance_cost,
+      Object.hashAll(monthly_cash_flows),
+      monthly_irr,
     );
   }
 }
