@@ -65,6 +65,7 @@ class _InputScreenState extends State<InputScreen>
       _showSpeechConfirmDialog(spokenText);
     } catch (e) {
       if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
       _goToFallback();
     } finally {
       if (mounted) {
@@ -134,7 +135,8 @@ class _InputScreenState extends State<InputScreen>
                 );
               } catch (e) {
                 if (!mounted) return;
-                _showSnack('$e');
+                ScaffoldMessenger.of(context).clearSnackBars();
+                _goToFallback();
               } finally {
                 if (mounted) {
                   setState(() {
@@ -187,7 +189,8 @@ class _InputScreenState extends State<InputScreen>
       );
     } catch (e) {
       if (!mounted) return;
-      _showSnack('$e');
+      ScaffoldMessenger.of(context).clearSnackBars();
+      _goToFallback();
     } finally {
       if (mounted) {
         setState(() {
@@ -237,6 +240,33 @@ class _InputScreenState extends State<InputScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.circle, color: Color(0xFF10B981), size: 10),
+                      SizedBox(width: 6),
+                      Text(
+                        'OFFLINE READY',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF374151),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const Text(
                 'Loan ki sacchai jaaniye.',
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),

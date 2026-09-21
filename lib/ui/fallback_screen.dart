@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'input_screen.dart';
+import 'validation_screen.dart';
 
 /// Screen 5: Global Fallback / Offline Resilience
 /// Triggered by AIUnavailableException, HTTP 429, or no WiFi.
@@ -23,10 +24,9 @@ class _FallbackScreenState extends State<FallbackScreen> {
     // Auto-route back to manual mode after 3 seconds — zero panic
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        Navigator.pushAndRemoveUntil(
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const InputScreen()),
-          (route) => false,
+          MaterialPageRoute(builder: (_) => const ValidationScreen()),
         );
       }
     });
@@ -50,7 +50,7 @@ class _FallbackScreenState extends State<FallbackScreen> {
               ),
               const SizedBox(height: 32),
               const Text(
-                'Network unstable.\nHigh traffic detected.',
+                'AI Network Unavailable.',
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -60,7 +60,7 @@ class _FallbackScreenState extends State<FallbackScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Reverting to secure local mode.',
+                'Routing to Secure Manual.',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black54,
