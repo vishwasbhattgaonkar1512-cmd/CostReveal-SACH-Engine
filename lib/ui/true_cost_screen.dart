@@ -33,9 +33,12 @@ class _TrueCostScreenState extends State<TrueCostScreen>
     _greenCtrl.forward().then((_) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          HapticFeedback.heavyImpact();
-          setState(() => _showRed = true);
-          _redCtrl.forward();
+          final appState = Provider.of<AppProvider>(context, listen: false);
+          if ((appState.calculationResult?.total_hidden_cost ?? 0) > 0) {
+            HapticFeedback.heavyImpact();
+            setState(() => _showRed = true);
+            _redCtrl.forward();
+          }
         }
       });
     });
@@ -97,14 +100,16 @@ class _TrueCostScreenState extends State<TrueCostScreen>
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: AppTheme.cardPadding),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppTheme.red, AppTheme.red.withValues(alpha: 0.8)],
+                colors: calc.total_hidden_cost > 0
+                    ? [AppTheme.red, AppTheme.red.withValues(alpha: 0.8)]
+                    : [AppTheme.green, AppTheme.green.withValues(alpha: 0.8)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(AppTheme.cardRadius),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.red.withValues(alpha: 0.4),
+                  color: (calc.total_hidden_cost > 0 ? AppTheme.red : AppTheme.green).withValues(alpha: 0.4),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 )
@@ -112,9 +117,9 @@ class _TrueCostScreenState extends State<TrueCostScreen>
             ),
             child: Column(
               children: [
-                const Text(
-                  'असली ब्याज दर (True APR)',
-                  style: TextStyle(fontSize: AppTheme.labelSize, color: Colors.white70, fontWeight: FontWeight.w600),
+                Text(
+                  calc.total_hidden_cost > 0 ? 'असली ब्याज दर (True APR)' : 'ईमानदार ब्याज दर (Honest APR)',
+                  style: const TextStyle(fontSize: AppTheme.labelSize, color: Colors.white70, fontWeight: FontWeight.w600),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
@@ -129,9 +134,9 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'यह है आपका असली बोझ',
-                  style: TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.white, fontWeight: FontWeight.w500),
+                Text(
+                  calc.total_hidden_cost > 0 ? 'यह है आपका असली बोझ' : 'पारदर्शी लोन',
+                  style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.white, fontWeight: FontWeight.w500),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -204,162 +209,194 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
           const SizedBox(height: 8),
 
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 24,
-            runSpacing: 8,
-            children: [
-              _legendItem(AppTheme.green, 'जो बताया गया (Promised)', dashed: false),
-              _legendItem(AppTheme.red, 'असली सच (True Cost)', dashed: true),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // Total Hidden Cost Loss Card
-          Container(
-            padding: const EdgeInsets.all(AppTheme.cardPadding),
-            decoration: BoxDecoration(
-              color: AppTheme.red.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-              border: Border.all(color: AppTheme.red.withValues(alpha: 0.3), width: 1.5),
-            ),
-            child: Column(
+          if (calc.total_hidden_cost > 0) ...[
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 24,
+              runSpacing: 8,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.warning_amber_rounded, color: AppTheme.red, size: 28),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
-                        style: const TextStyle(
-                          fontSize: 26, fontWeight: AppTheme.numberWeight,
-                          color: AppTheme.red, letterSpacing: -0.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Loss of ₹${calc.total_hidden_cost.toStringAsFixed(0)}',
-                  style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.red, fontWeight: FontWeight.w500),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(color: Colors.black12, height: 1),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                      child: const Icon(Icons.school_rounded, color: AppTheme.navy, size: 24),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
-                            style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark)',
-                            style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                _legendItem(AppTheme.green, 'जो बताया गया (Promised)', dashed: false),
+                _legendItem(AppTheme.red, 'असली सच (True Cost)', dashed: true),
               ],
             ),
-          ),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          const Text(
-            'महंगा क्यों हुआ? (What Changed the Cost?)',
-            style: TextStyle(fontSize: AppTheme.bodyMin, fontWeight: FontWeight.w700, color: AppTheme.navy),
-          ),
-          const SizedBox(height: 12),
-          
-          _costChangeCard(
-            title: 'फ्लैट रेट (Flat Rate)',
-            subtitle: 'Interest charged on full amount, not remaining balance.',
-            impact: 'Double interest burden',
-            icon: Icons.percent_rounded,
-          ),
-          if (terms.upfront_processing_fee > 0)
-            _costChangeCard(
-              title: 'प्रोसेसिंग फीस (Processing Fee)',
-              subtitle: '₹${terms.upfront_processing_fee.toStringAsFixed(0)} deducted upfront before you even get the money.',
-              impact: 'Reduces money in hand',
-              icon: Icons.money_off_rounded,
-            ),
-          if (terms.monthly_insurance_premium > 0)
-            _costChangeCard(
-              title: 'बीमा (Insurance)',
-              subtitle: '₹${terms.monthly_insurance_premium.toStringAsFixed(0)} extra taken from you every month.',
-              impact: 'Increases EMI artificially',
-              icon: Icons.health_and_safety_rounded,
-            ),
-
-          const SizedBox(height: 16),
-
-          Container(
-            padding: const EdgeInsets.all(AppTheme.cardPadding),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFFBEB),
-              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-              border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.warning_rounded, color: Color(0xFFF59E0B), size: 24),
-                    const SizedBox(width: 8),
-                    const Expanded(
-                      child: Text(
-                        'लोन को महंगा बनाने वाले कारण\n(Cost-Affecting Patterns)',
-                        style: TextStyle(
-                          fontSize: AppTheme.labelSize, fontWeight: FontWeight.w900,
-                          color: Color(0xFFD97706), letterSpacing: 0.5,
+            // Total Hidden Cost Loss Card
+            Container(
+              padding: const EdgeInsets.all(AppTheme.cardPadding),
+              decoration: BoxDecoration(
+                color: AppTheme.red.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+                border: Border.all(color: AppTheme.red.withValues(alpha: 0.3), width: 1.5),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, color: AppTheme.red, size: 28),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
+                          style: const TextStyle(
+                            fontSize: 26, fontWeight: AppTheme.numberWeight,
+                            color: AppTheme.red, letterSpacing: -0.5,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _patternRow('फ्लैट रेट (Flat Rate) का झांसा'),
-                _patternRow('पैसे पहले ही काट लेना (Upfront deduction)'),
-                _patternRow('ज़बरदस्ती का इंश्योरेंस (Forced Insurance)'),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Divider(color: Colors.black12, height: 1),
-                ),
-                Text(
-                  '$patternCount patterns detected',
-                  style: const TextStyle(
-                    fontSize: AppTheme.labelSize, fontWeight: FontWeight.bold,
-                    color: AppTheme.textSecondary,
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    'Loss of ₹${calc.total_hidden_cost.toStringAsFixed(0)}',
+                    style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.red, fontWeight: FontWeight.w500),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Divider(color: Colors.black12, height: 1),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.border),
+                        ),
+                        child: const Icon(Icons.school_rounded, color: AppTheme.navy, size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
+                              style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark)',
+                              style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
+
+            const SizedBox(height: 24),
+
+            const Text(
+              'महंगा क्यों हुआ? (What Changed the Cost?)',
+              style: TextStyle(fontSize: AppTheme.bodyMin, fontWeight: FontWeight.w700, color: AppTheme.navy),
+            ),
+            const SizedBox(height: 12),
+            
+            _costChangeCard(
+              title: 'फ्लैट रेट (Flat Rate)',
+              subtitle: 'Interest charged on full amount, not remaining balance.',
+              impact: 'Double interest burden',
+              icon: Icons.percent_rounded,
+            ),
+            if (terms.upfront_processing_fee > 0)
+              _costChangeCard(
+                title: 'प्रोसेसिंग फीस (Processing Fee)',
+                subtitle: '₹${terms.upfront_processing_fee.toStringAsFixed(0)} deducted upfront before you even get the money.',
+                impact: 'Reduces money in hand',
+                icon: Icons.money_off_rounded,
+              ),
+            if (terms.monthly_insurance_premium > 0)
+              _costChangeCard(
+                title: 'बीमा (Insurance)',
+                subtitle: '₹${terms.monthly_insurance_premium.toStringAsFixed(0)} extra taken from you every month.',
+                impact: 'Increases EMI artificially',
+                icon: Icons.health_and_safety_rounded,
+              ),
+
+            const SizedBox(height: 16),
+
+            Container(
+              padding: const EdgeInsets.all(AppTheme.cardPadding),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFBEB),
+                borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+                border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.warning_rounded, color: Color(0xFFF59E0B), size: 24),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          'लोन को महंगा बनाने वाले कारण\n(Cost-Affecting Patterns)',
+                          style: TextStyle(
+                            fontSize: AppTheme.labelSize, fontWeight: FontWeight.w900,
+                            color: Color(0xFFD97706), letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _patternRow('फ्लैट रेट (Flat Rate) का झांसा'),
+                  if (terms.upfront_processing_fee > 0) _patternRow('पैसे पहले ही काट लेना (Upfront deduction)'),
+                  if (terms.monthly_insurance_premium > 0) _patternRow('ज़बरदस्ती का इंश्योरेंस (Forced Insurance)'),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Divider(color: Colors.black12, height: 1),
+                  ),
+                  Text(
+                    '$patternCount patterns detected',
+                    style: const TextStyle(
+                      fontSize: AppTheme.labelSize, fontWeight: FontWeight.bold,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            // Fair Loan Success Card (No Hidden Costs)
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppTheme.green.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+                border: Border.all(color: AppTheme.green.withValues(alpha: 0.5), width: 1.5),
+              ),
+              child: const Column(
+                children: [
+                  Icon(Icons.verified_user_rounded, color: AppTheme.green, size: 48),
+                  SizedBox(height: 16),
+                  Text(
+                    'ईमानदार लोन (Honest Loan)',
+                    style: TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold,
+                      color: AppTheme.green,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'इस लोन में कोई छुपे हुए चार्ज नहीं हैं। जो ब्याज दर बताई गई है, वही असली ब्याज दर है। (No hidden costs detected!)',
+                    style: TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, height: 1.4),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           const SizedBox(height: 24),
 
