@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'CoastReveal',
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xFFF9F9F9), // True White/Off-white for Mumbai Sunlight
