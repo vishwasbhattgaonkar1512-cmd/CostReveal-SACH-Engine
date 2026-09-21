@@ -204,11 +204,12 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
           const SizedBox(height: 8),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 24,
+            runSpacing: 8,
             children: [
               _legendItem(AppTheme.green, 'जो बताया गया (Promised)', dashed: false),
-              const SizedBox(width: 24),
               _legendItem(AppTheme.red, 'असली सच (True Cost)', dashed: true),
             ],
           ),
@@ -230,11 +231,14 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                   children: [
                     const Icon(Icons.warning_amber_rounded, color: AppTheme.red, size: 28),
                     const SizedBox(width: 8),
-                    Text(
-                      '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
-                      style: const TextStyle(
-                        fontSize: 26, fontWeight: AppTheme.numberWeight,
-                        color: AppTheme.red, letterSpacing: -0.5,
+                    Flexible(
+                      child: Text(
+                        '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
+                        style: const TextStyle(
+                          fontSize: 26, fontWeight: AppTheme.numberWeight,
+                          color: AppTheme.red, letterSpacing: -0.5,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
@@ -489,17 +493,20 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
   Widget _legendItem(Color color, String label, {required bool dashed}) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: 32, height: 4,
           child: CustomPaint(painter: _LinePainter(color, dashed)),
         ),
         const SizedBox(width: 8),
-        Text(label,
-            style: TextStyle(
-                fontSize: AppTheme.labelSize,
-                fontWeight: FontWeight.w700,
-                color: color)),
+        Flexible(
+          child: Text(label,
+              style: TextStyle(
+                  fontSize: AppTheme.labelSize,
+                  fontWeight: FontWeight.w700,
+                  color: color)),
+        ),
       ],
     );
   }
