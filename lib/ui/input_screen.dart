@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../bridge/sensor_handler.dart';
 import '../bridge/gemini_api.dart';
 import '../state/app_state.dart';
@@ -45,7 +45,7 @@ class _InputScreenState extends State<InputScreen>
     super.dispose();
   }
 
-  // ── Voice Entry ─────────────────────────────────────────────────────────
+  // â”€â”€ Voice Entry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Future<void> _onMicTap() async {
     if (_isListening || _isAiProcessing) return;
 
@@ -80,7 +80,7 @@ class _InputScreenState extends State<InputScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text(
-          'Aapne kaha:',
+          'आपने कहा:',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         content: Column(
@@ -102,7 +102,7 @@ class _InputScreenState extends State<InputScreen>
             ),
             const SizedBox(height: 12),
             const Text(
-              'Abhi Gemini parsing pending hai.\nValidation screen par manually numbers darj karein.',
+              'आपकी लोन जानकारी तैयार की जा रही है…\nकृपया नीचे विवरण जाँचें।',
               style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
           ],
@@ -110,7 +110,7 @@ class _InputScreenState extends State<InputScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Wapas jayein'),
+            child: const Text('वापस जाएं'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -149,14 +149,14 @@ class _InputScreenState extends State<InputScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E3A8A),
             ),
-            child: const Text('Validation Screen'),
+            child: const Text('विवरण जाँचें'),
           ),
         ],
       ),
     );
   }
 
-  // ── Camera Entry ─────────────────────────────────────────────────────────
+  // â”€â”€ Camera Entry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Future<void> _onCameraTap() async {
     if (_isCapturing || _isAiProcessing) return;
 
@@ -217,7 +217,7 @@ class _InputScreenState extends State<InputScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LoanKaSach'),
+        title: const Text('CoastReveal'),
         actions: [
           Row(
             children: [
@@ -268,14 +268,14 @@ class _InputScreenState extends State<InputScreen>
                 ),
               ),
               const Text(
-                'Loan ki sacchai jaaniye.',
+                'लोन का असली सच जानें।',
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
 
               const Spacer(),
 
-              // ── HERO: Pulsing/Listening Mic ────────────────────────────
+              // â”€â”€ HERO: Pulsing/Listening Mic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               Center(
                 child: GestureDetector(
                   onTap: _onMicTap,
@@ -318,8 +318,8 @@ class _InputScreenState extends State<InputScreen>
               const SizedBox(height: 16),
               Text(
                 _isListening
-                    ? 'Sun raha hoon... (Listening...)'
-                    : 'Bol kar batayein',
+                    ? 'सुन रहा हूँ… (Listening…)'
+                    : 'बोल कर बताएं',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -333,7 +333,7 @@ class _InputScreenState extends State<InputScreen>
               const Spacer(),
 
               const Text(
-                'Ya khud select karein:',
+                'या खुद भरें:',
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -341,7 +341,7 @@ class _InputScreenState extends State<InputScreen>
               ),
               const SizedBox(height: 12),
 
-              // ── Secondary: Camera + Manual chips ─────────────────────────
+              // â”€â”€ Secondary: Camera + Manual chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -350,13 +350,13 @@ class _InputScreenState extends State<InputScreen>
                       icon: _isCapturing
                           ? Icons.hourglass_top_rounded
                           : Icons.camera_alt_rounded,
-                      label: _isCapturing ? 'Capturing...' : 'KFS Photo Lein',
+                      label: _isCapturing ? 'फोटो स्कैन हो रही है…' : 'KFS की फोटो लें',
                       onTap: _onCameraTap,
                     ),
                     const SizedBox(width: 12),
                     _buildChip(
                       icon: Icons.edit_rounded,
-                      label: 'Manual Entry',
+                      label: 'खुद टाइप करें',
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -378,7 +378,7 @@ class _InputScreenState extends State<InputScreen>
                   minimumSize: const Size(double.infinity, 60),
                 ),
                 child: const Text(
-                  'Haath se darj karein  (Manual Entry)',
+                  'लोन की डिटेल्स चेक करें',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -418,4 +418,5 @@ class _InputScreenState extends State<InputScreen>
     );
   }
 }
+
 
