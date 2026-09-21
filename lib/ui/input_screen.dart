@@ -58,7 +58,7 @@ class _InputScreenState extends State<InputScreen>
       if (!mounted) return;
 
       if (spokenText.trim().isEmpty) {
-        _showSnack('Koi awaaz nahi aayi. Dobara try karein. (No speech detected.)');
+        _showSnack('कोई आवाज़ नहीं आई। दोबारा कोशिश करें।');
         return;
       }
 
@@ -102,7 +102,7 @@ class _InputScreenState extends State<InputScreen>
             ),
             const SizedBox(height: 12),
             const Text(
-              'Abhi Gemini parsing pending hai.\nValidation screen par manually numbers darj karein.',
+              'आपकी लोन जानकारी तैयार की जा रही है…\nकृपया नीचे विवरण जाँचें।',
               style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
           ],
@@ -110,7 +110,7 @@ class _InputScreenState extends State<InputScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Wapas jayein'),
+            child: const Text('वापस जाएं'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -121,7 +121,7 @@ class _InputScreenState extends State<InputScreen>
               
               setState(() => _isListening = true);
               try {
-                _showSnack('Voice captured. Extracting with AI...');
+                _showSnack('आवाज़ मिली! AI से जानकारी निकाल रहे हैं…');
                 final geminiApi = GeminiApi();
                 final candidateTerms = await geminiApi.extractFromText(spokenText);
                 
@@ -149,7 +149,7 @@ class _InputScreenState extends State<InputScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E3A8A),
             ),
-            child: const Text('Validation Screen'),
+            child: const Text('विवरण जाँचें'),
           ),
         ],
       ),
@@ -174,7 +174,7 @@ class _InputScreenState extends State<InputScreen>
       final appProvider = Provider.of<AppProvider>(context, listen: false);
       appProvider.setPendingCameraImage(base64Image);
 
-      _showSnack('Camera image captured. Extracting with AI...');
+      _showSnack('फोटो मिली! AI से जानकारी निकाल रहे हैं…');
       
       final geminiApi = GeminiApi();
       final candidateTerms = await geminiApi.extractFromImage(base64Image);
@@ -255,7 +255,7 @@ class _InputScreenState extends State<InputScreen>
                       Icon(Icons.circle, color: Color(0xFF10B981), size: 10),
                       SizedBox(width: 6),
                       Text(
-                        'OFFLINE READY',
+                        '🟢 OFFLINE MODE',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -268,7 +268,7 @@ class _InputScreenState extends State<InputScreen>
                 ),
               ),
               const Text(
-                'Loan ki sacchai jaaniye.',
+                'लोन का असली सच जानें।',
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
@@ -318,7 +318,7 @@ class _InputScreenState extends State<InputScreen>
               const SizedBox(height: 16),
               Text(
                 _isListening
-                    ? 'Sun raha hoon... (Listening...)'
+                    ? 'सुन रहा हूँ… (Listening…)'
                     : 'बोल कर बताएं',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -333,7 +333,7 @@ class _InputScreenState extends State<InputScreen>
               const Spacer(),
 
               const Text(
-                'Ya khud select karein:',
+                'या खुद भरें:',
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -350,13 +350,13 @@ class _InputScreenState extends State<InputScreen>
                       icon: _isCapturing
                           ? Icons.hourglass_top_rounded
                           : Icons.camera_alt_rounded,
-                      label: _isCapturing ? 'Capturing...' : 'KFS Photo Lein',
+                      label: _isCapturing ? 'फोटो स्कैन हो रही है…' : 'KFS की फोटो लें',
                       onTap: _onCameraTap,
                     ),
                     const SizedBox(width: 12),
                     _buildChip(
                       icon: Icons.edit_rounded,
-                      label: 'Manual Entry',
+                      label: 'खुद टाइप करें',
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -378,7 +378,7 @@ class _InputScreenState extends State<InputScreen>
                   minimumSize: const Size(double.infinity, 60),
                 ),
                 child: const Text(
-                  'Haath se darj karein  (Manual Entry)',
+                  'खुद टाइप करें  (Manual Entry)',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),

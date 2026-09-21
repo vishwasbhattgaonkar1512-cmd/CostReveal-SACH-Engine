@@ -60,11 +60,11 @@ class _ValidationScreenState extends State<ValidationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppProvider>(context, listen: false);
+    final appState = Provider.of<AppProvider>(context, listen: true);
 
     return Scaffold(
       backgroundColor: AppTheme.bg,
-      appBar: AppBar(title: const Text('Numbers jaanch karein')),
+      appBar: AppBar(title: const Text('संख्याएँ जाँचें  (Verify Numbers)')),
       body: ListView(
         padding: const EdgeInsets.all(AppTheme.cardPadding),
         children: [
@@ -222,7 +222,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
                       ),
                       decoration: InputDecoration(
                         fillColor: confirmed ? const Color(0xFFF3F4F6) : AppTheme.white,
-                        hintText: confirmed ? 'Confirmed' : 'Yahaan type karein...',
+                        hintText: confirmed ? 'Confirmed' : 'यहाँ टाइप करें…',
                       ),
                       onChanged: onChanged,
                     ),
