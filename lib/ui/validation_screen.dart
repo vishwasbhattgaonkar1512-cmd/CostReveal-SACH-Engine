@@ -33,6 +33,14 @@ class _ValidationScreenState extends State<ValidationScreen> {
   int  get _confirmedCount => _confirmed.values.where((v) => v).length;
   int  get _totalFields    => _confirmed.length;
 
+  String? _getFieldError(String value) {
+    if (value.isEmpty) return null;
+    final parsed = double.tryParse(value);
+    if (parsed == null) return 'अमान्य संख्या (Invalid number)';
+    if (parsed < 0) return 'नकारात्मक नहीं हो सकता (No negatives)';
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -151,11 +159,29 @@ class _ValidationScreenState extends State<ValidationScreen> {
           ElevatedButton(
             onPressed: _allConfirmed
                 ? () {
-                    if (appState.validateAndConfirmTerms()) { appState.calculateTrueAPR(); }
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const TrueCostScreen()),
-                    );
+                    if (appState.validateAndConfirmTerms()) {
+                      if (appState.calculateTrueAPR()) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const TrueCostScreen()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(appState.errorMessage ?? 'Calculation failed')),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(appState.errorMessage ?? 'Validation failed'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      // Uncheck all boxes if validation failed so user can fix them
+                      setState(() {
+                        _confirmed.updateAll((key, value) => false);
+                      });
+                    }
                   }
                 : null,
             style: ElevatedButton.styleFrom(
@@ -214,6 +240,9 @@ class _ValidationScreenState extends State<ValidationScreen> {
                       controller: controller,
                       enabled: !confirmed,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                      ],
                       style: TextStyle(
                         fontSize: AppTheme.subheadline,
                         fontWeight: AppTheme.numberWeight,
@@ -223,6 +252,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
                       decoration: InputDecoration(
                         fillColor: confirmed ? const Color(0xFFF3F4F6) : AppTheme.white,
                         hintText: confirmed ? '✓ सत्यापित' : 'यहाँ टाइप करें…',
+                        errorText: _getFieldError(controller.text),
                       ),
                       onChanged: onChanged,
                     ),
