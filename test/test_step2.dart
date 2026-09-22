@@ -33,7 +33,7 @@ void main() {
 
     // ── SAVE TO DISK ──────────────────────────────────────────────────────
     final outputFile = File(
-      'D:/CostRevealEnv/CostReveal-SACH-Engine/test_output_review.pdf',
+      'test_output_review.pdf',
     );
     await outputFile.writeAsBytes(pdfBytes);
     // ─────────────────────────────────────────────────────────────────────
@@ -42,7 +42,7 @@ void main() {
     print('======================================================');
     print('  PDF SAVED SUCCESSFULLY');
     print('  Size: ${pdfBytes.length} bytes');
-    print('  Path: D:/CostRevealEnv/CostReveal-SACH-Engine/');
+    print('  Path: ');
     print('        test_output_review.pdf');
     print('======================================================');
     print('  EVIDENCE TRACE IN PDF:');
