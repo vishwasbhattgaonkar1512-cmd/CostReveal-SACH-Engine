@@ -136,6 +136,116 @@ class _TrueCostScreenState extends State<TrueCostScreen>
       body: ListView(
         padding: const EdgeInsets.all(AppTheme.cardPadding),
         children: [
+          // Net Received Card
+          Container(
+            padding: const EdgeInsets.all(AppTheme.cardPadding),
+            decoration: BoxDecoration(
+              color: AppTheme.green.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+              border: Border.all(color: AppTheme.green.withValues(alpha: 0.35), width: 1.5),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.account_balance_wallet_rounded, color: AppTheme.green, size: 28),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '₹${calc.net_disbursed_amount.toStringAsFixed(0)} आपको वास्तव में मिले (Net Received)',
+                        style: const TextStyle(
+                          fontSize: 32, fontWeight: AppTheme.numberWeight,
+                          color: AppTheme.green, letterSpacing: -0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Actual amount deposited to your account',
+                  style: TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.green, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Hidden Cost card — severity-aware colours
+          Container(
+            padding: const EdgeInsets.all(AppTheme.cardPadding),
+            decoration: BoxDecoration(
+              color: severityColor.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+              border: Border.all(color: severityColor.withValues(alpha: 0.35), width: 1.5),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(severityIcon, color: severityColor, size: 28),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '₹${calc.total_hidden_cost.toStringAsFixed(0)} अतिरिक्त लागत (Extra Cost)',
+                        style: TextStyle(
+                          fontSize: 32, fontWeight: AppTheme.numberWeight,
+                          color: severityColor, letterSpacing: -0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Extra cost vs fair reducing-balance loan',
+                  style: TextStyle(fontSize: AppTheme.labelSize, color: severityColor, fontWeight: FontWeight.w500),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(color: Colors.black12, height: 1),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTheme.border),
+                      ),
+                      child: const Icon(Icons.school_rounded, color: AppTheme.navy, size: 24),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
+                            style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark)',
+                            style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
           // Hero APR Card — severity-aware
           Container(
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: AppTheme.cardPadding),
@@ -293,78 +403,6 @@ class _TrueCostScreenState extends State<TrueCostScreen>
               _legendItem(AppTheme.green, 'जो बताया गया (Promised)', dashed: false),
               _legendItem(severityColor, 'असली सच (True Cost)', dashed: true),
             ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // Hidden Cost card — severity-aware colours
-          Container(
-            padding: const EdgeInsets.all(AppTheme.cardPadding),
-            decoration: BoxDecoration(
-              color: severityColor.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-              border: Border.all(color: severityColor.withValues(alpha: 0.35), width: 1.5),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(severityIcon, color: severityColor, size: 28),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        '₹${calc.total_hidden_cost.toStringAsFixed(0)} अतिरिक्त लागत (Extra Cost)',
-                        style: TextStyle(
-                          fontSize: 32, fontWeight: AppTheme.numberWeight,
-                          color: severityColor, letterSpacing: -0.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Extra cost vs fair reducing-balance loan',
-                  style: TextStyle(fontSize: AppTheme.labelSize, color: severityColor, fontWeight: FontWeight.w500),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(color: Colors.black12, height: 1),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                      child: const Icon(Icons.school_rounded, color: AppTheme.navy, size: 24),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
-                            style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark)',
-                            style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
           ),
 
           const SizedBox(height: 24),
