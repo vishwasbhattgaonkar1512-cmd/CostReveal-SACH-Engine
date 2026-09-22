@@ -316,7 +316,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                       child: Text(
                         '₹${calc.total_hidden_cost.toStringAsFixed(0)} अतिरिक्त लागत (Extra Cost)',
                         style: TextStyle(
-                          fontSize: 26, fontWeight: AppTheme.numberWeight,
+                          fontSize: 32, fontWeight: AppTheme.numberWeight,
                           color: severityColor, letterSpacing: -0.5,
                         ),
                         textAlign: TextAlign.center,
@@ -488,7 +488,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                     _evidenceArrow(),
                     _evidenceRow('इंश्योरेंस का खर्चा\n(Insurance Cost)', '- ₹${calc.insurance_cost.toStringAsFixed(0)}', isDeduction: true),
                     _evidenceArrow(),
-                    _evidenceRow('आपको वास्तव में मिले\n(Net Received)', '₹${calc.net_disbursed_amount.toStringAsFixed(0)}', isBold: true),
+                    _evidenceRow('आपको वास्तव में मिले\n(Net Received)', '₹${calc.net_disbursed_amount.toStringAsFixed(0)}', isBold: true, isGreen: true),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Divider(color: Colors.black12, height: 1),
@@ -611,7 +611,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
     );
   }
 
-  Widget _evidenceRow(String label, String value, {bool highlight = false, bool isDeduction = false, bool isBold = false}) {
+  Widget _evidenceRow(String label, String value, {bool highlight = false, bool isDeduction = false, bool isBold = false, bool isGreen = false}) {
     if (highlight) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -653,7 +653,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
               style: TextStyle(
                 fontSize: AppTheme.bodyMin,
                 fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-                color: isDeduction ? AppTheme.red : AppTheme.navy,
+                color: isGreen ? AppTheme.green : (isDeduction ? AppTheme.red : AppTheme.navy),
                 letterSpacing: -0.5,
               )),
         ],
