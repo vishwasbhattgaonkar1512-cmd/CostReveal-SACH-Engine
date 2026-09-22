@@ -116,13 +116,13 @@ class _TrueCostScreenState extends State<TrueCostScreen>
         ? 'Slightly Above Fair'
         : isMedium
             ? 'Expensive Loan'
-            : 'Predatory Loan';
+            : 'High Effective Cost';
 
     final String severitySubtext = isLow
         ? 'यह लोन थोड़ा महंगा है, लेकिन स्वीकार्य है।'
         : isMedium
             ? 'यह लोन ज़रूरत से ज़्यादा महंगा है।'
-            : 'यह लोन आपको लूट रहा है! (Very high hidden costs)';
+            : 'Additional borrowing cost detected.';
 
     final IconData severityIcon = isLow
         ? Icons.info_rounded
@@ -314,7 +314,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
-                        '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
+                        '₹${calc.total_hidden_cost.toStringAsFixed(0)} अतिरिक्त लागत (Extra Cost)',
                         style: TextStyle(
                           fontSize: 26, fontWeight: AppTheme.numberWeight,
                           color: severityColor, letterSpacing: -0.5,
@@ -488,7 +488,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                     _evidenceArrow(),
                     _evidenceRow('इंश्योरेंस का खर्चा\n(Insurance Cost)', '- ₹${calc.insurance_cost.toStringAsFixed(0)}', isDeduction: true),
                     _evidenceArrow(),
-                    _evidenceRow('हाथ में कितने पैसे आए\n(Net Amount Received)', '₹${calc.net_disbursed_amount.toStringAsFixed(0)}', isBold: true),
+                    _evidenceRow('आपको वास्तव में मिले\n(Net Received)', '₹${calc.net_disbursed_amount.toStringAsFixed(0)}', isBold: true),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Divider(color: Colors.black12, height: 1),

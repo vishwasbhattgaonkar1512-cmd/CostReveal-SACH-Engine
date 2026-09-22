@@ -188,7 +188,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
               backgroundColor: _allConfirmed ? AppTheme.green : AppTheme.border,
               foregroundColor: AppTheme.white,
             ),
-            child: const Text('लोन का असली सच जानें  (See True Cost)'),
+            child: const Text('✓ जानकारी सही है, आगे बढ़ें'),
           ),
         ],
       ),
@@ -251,7 +251,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
                       ),
                       decoration: InputDecoration(
                         fillColor: confirmed ? const Color(0xFFF3F4F6) : AppTheme.white,
-                        hintText: confirmed ? '✓ सत्यापित' : 'यहाँ टाइप करें…',
+                        hintText: confirmed ? '✓ सत्यापित' : '✎ बदलें',
                         errorText: _getFieldError(controller.text),
                       ),
                       onChanged: onChanged,

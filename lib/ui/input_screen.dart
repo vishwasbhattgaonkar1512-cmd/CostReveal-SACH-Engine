@@ -737,6 +737,50 @@ class _InputScreenState extends State<InputScreen>
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.black12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          'How CostReveal Works',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black45, letterSpacing: 0.5),
+                        ),
+                        const SizedBox(height: 10),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _trustStep(Icons.auto_awesome, 'AI\nExtracts'),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4),
+                                child: Icon(Icons.arrow_forward_ios_rounded, size: 10, color: Colors.black26),
+                              ),
+                              _trustStep(Icons.person_rounded, 'HUMAN\nVerifies'),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4),
+                                child: Icon(Icons.arrow_forward_ios_rounded, size: 10, color: Colors.black26),
+                              ),
+                              _trustStep(Icons.calculate_rounded, 'ENGINE\nCalculates'),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4),
+                                child: Icon(Icons.arrow_forward_ios_rounded, size: 10, color: Colors.black26),
+                              ),
+                              _trustStep(Icons.analytics_rounded, 'EVIDENCE\nExplains'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -807,6 +851,21 @@ class _InputScreenState extends State<InputScreen>
           ],
         ),
       ),
+    );
+  }
+
+  Widget _trustStep(IconData icon, String label) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: const Color(0xFF1E3A8A), size: 20),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.2),
+        ),
+      ],
     );
   }
 }
