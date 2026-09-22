@@ -17,7 +17,7 @@ class GeminiApi {
   static const String _placeholderApiKey = 'API_KEY_PLACEHOLDER';
   
   final String _apiKey;
-  final String _model = 'gemini-3.8-flash';
+  final String _model = 'gemini-3.6-flash';
   final http.Client _client;
 
   GeminiApi({String? apiKey, http.Client? client}) 

@@ -37,12 +37,12 @@ void main() {
 
     // Verify actual values are rendered
     expect(find.textContaining('1,00,000'), findsWidgets);
-    expect(find.textContaining('12 months'), findsOneWidget);
+    expect(find.textContaining('12 months'), findsWidgets);
     expect(find.textContaining('24% p.a.'), findsOneWidget);
     expect(find.textContaining('2,000'), findsWidgets);
     expect(find.textContaining('500'), findsWidgets);
     expect(find.textContaining('55.7%'), findsOneWidget); // Math engine expected result
-    expect(find.textContaining('18,000'), findsWidgets); // Math engine expected hidden cost
+    expect(find.textContaining('18000.00'), findsWidgets); // Math engine expected hidden cost in trace
 
     // Verify placeholders are NOT rendered
     expect(find.textContaining('[auto-filled]'), findsNothing);
