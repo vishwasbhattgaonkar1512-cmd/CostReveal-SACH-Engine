@@ -124,6 +124,18 @@ class MathEngine {
       terms.advertised_flat_rate,
     );
 
+    final cashFlowTrace = _buildCashFlowTrace(
+      sanctionedAmount: terms.principal_amount,
+      processingFee: terms.upfront_processing_fee,
+      insuranceCost: terms.monthly_insurance_premium,
+      tenureMonths: terms.tenure_months,
+      netDisbursed: netDisbursed,
+      advertisedMonthlyEmi: advertisedMonthlyEmi,
+      actualMonthlyOutflow: actualMonthlyOutflow,
+      trueAPR: trueAPR,
+      hiddenCost: hiddenCost,
+    );
+
     // Step 7: Package the truth for human consumption
     // Now includes ALL evidence trace data for UI expander (Task 1)
     return CalculationResult(
@@ -138,8 +150,60 @@ class MathEngine {
       insurance_cost: terms.monthly_insurance_premium,
       monthly_cash_flows: List.unmodifiable(cashFlows), // Immutable list
       monthly_irr: monthlyIRR * 100, // Convert to percentage
+      cash_flow_trace: List.unmodifiable(cashFlowTrace),
     );
   }
+
+  /// Build a human-readable evidence trace of the calculation steps.
+  List<String> _buildCashFlowTrace({
+    required double sanctionedAmount,
+    required double processingFee,
+    required double insuranceCost,
+    required int tenureMonths,
+    required double netDisbursed,
+    required double advertisedMonthlyEmi,
+    required double actualMonthlyOutflow,
+    required double trueAPR,
+    required double hiddenCost,
+  }) {
+    final trace = <String>[];
+
+    trace.add('Sanctioned: ₹${sanctionedAmount.toStringAsFixed(2)}');
+
+    if (processingFee > 0) {
+      trace.add(
+        'Minus Processing Fee: -₹${processingFee.toStringAsFixed(2)}',
+      );
+    }
+
+    if (insuranceCost > 0) {
+      final totalInsurance = insuranceCost * tenureMonths;
+      trace.add(
+        'Minus Insurance (total over $tenureMonths months): '
+        '-₹${totalInsurance.toStringAsFixed(2)}',
+      );
+    }
+
+    trace.add('Net Received: ₹${netDisbursed.toStringAsFixed(2)}');
+    trace.add(
+      'Monthly EMI (flat-rate): ₹${advertisedMonthlyEmi.toStringAsFixed(2)}',
+    );
+
+    if (insuranceCost > 0) {
+      trace.add(
+        'Monthly Insurance Premium: ₹${insuranceCost.toStringAsFixed(2)}',
+      );
+    }
+
+    trace.add(
+      'Total Monthly Outflow: ₹${actualMonthlyOutflow.toStringAsFixed(2)}',
+    );
+    trace.add('True APR (IRR method): ${trueAPR.toStringAsFixed(2)}%');
+    trace.add('Total Hidden Cost: ₹${hiddenCost.toStringAsFixed(2)}');
+
+    return trace;
+  }
+
   // ============================================================================
   // TRAP 1: FLAT RATE DECEPTION CALCULATOR
   // ============================================================================

@@ -116,13 +116,13 @@ class _TrueCostScreenState extends State<TrueCostScreen>
         ? 'Slightly Above Fair'
         : isMedium
             ? 'Expensive Loan'
-            : 'Predatory Loan';
+            : 'High Effective Cost';
 
     final String severitySubtext = isLow
         ? 'यह लोन थोड़ा महंगा है, लेकिन स्वीकार्य है।'
         : isMedium
             ? 'यह लोन ज़रूरत से ज़्यादा महंगा है।'
-            : 'यह लोन आपको लूट रहा है! (Very high hidden costs)';
+            : 'Additional borrowing cost detected.';
 
     final IconData severityIcon = isLow
         ? Icons.info_rounded
@@ -136,6 +136,116 @@ class _TrueCostScreenState extends State<TrueCostScreen>
       body: ListView(
         padding: const EdgeInsets.all(AppTheme.cardPadding),
         children: [
+          // Net Received Card
+          Container(
+            padding: const EdgeInsets.all(AppTheme.cardPadding),
+            decoration: BoxDecoration(
+              color: AppTheme.green.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+              border: Border.all(color: AppTheme.green.withValues(alpha: 0.35), width: 1.5),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.account_balance_wallet_rounded, color: AppTheme.green, size: 28),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '₹${calc.net_disbursed_amount.toStringAsFixed(0)} आपको वास्तव में मिले (Net Received)',
+                        style: const TextStyle(
+                          fontSize: 32, fontWeight: AppTheme.numberWeight,
+                          color: AppTheme.green, letterSpacing: -0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Actual amount deposited to your account',
+                  style: TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.green, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Hidden Cost card — severity-aware colours
+          Container(
+            padding: const EdgeInsets.all(AppTheme.cardPadding),
+            decoration: BoxDecoration(
+              color: severityColor.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+              border: Border.all(color: severityColor.withValues(alpha: 0.35), width: 1.5),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(severityIcon, color: severityColor, size: 28),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '₹${calc.total_hidden_cost.toStringAsFixed(0)} अतिरिक्त लागत (Extra Cost)',
+                        style: TextStyle(
+                          fontSize: 32, fontWeight: AppTheme.numberWeight,
+                          color: severityColor, letterSpacing: -0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Extra cost vs fair reducing-balance loan',
+                  style: TextStyle(fontSize: AppTheme.labelSize, color: severityColor, fontWeight: FontWeight.w500),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(color: Colors.black12, height: 1),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTheme.border),
+                      ),
+                      child: const Icon(Icons.school_rounded, color: AppTheme.navy, size: 24),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
+                            style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark)',
+                            style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
           // Hero APR Card — severity-aware
           Container(
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: AppTheme.cardPadding),
@@ -297,78 +407,6 @@ class _TrueCostScreenState extends State<TrueCostScreen>
 
           const SizedBox(height: 24),
 
-          // Hidden Cost card — severity-aware colours
-          Container(
-            padding: const EdgeInsets.all(AppTheme.cardPadding),
-            decoration: BoxDecoration(
-              color: severityColor.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-              border: Border.all(color: severityColor.withValues(alpha: 0.35), width: 1.5),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(severityIcon, color: severityColor, size: 28),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        '₹${calc.total_hidden_cost.toStringAsFixed(0)} का नुकसान',
-                        style: TextStyle(
-                          fontSize: 26, fontWeight: AppTheme.numberWeight,
-                          color: severityColor, letterSpacing: -0.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Extra cost vs fair reducing-balance loan',
-                  style: TextStyle(fontSize: AppTheme.labelSize, color: severityColor, fontWeight: FontWeight.w500),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(color: Colors.black12, height: 1),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                      child: const Icon(Icons.school_rounded, color: AppTheme.navy, size: 24),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'मतलब ${schoolMonths.toStringAsFixed(1)} महीने की स्कूल फीस!',
-                            style: const TextStyle(fontSize: AppTheme.bodyMin, color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '= ${schoolMonths.toStringAsFixed(1)} months of school fees (NSSO benchmark)',
-                            style: const TextStyle(fontSize: AppTheme.labelSize, color: AppTheme.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
           const Text(
             'महंगा क्यों हुआ? (What Changed the Cost?)',
             style: TextStyle(fontSize: AppTheme.bodyMin, fontWeight: FontWeight.w700, color: AppTheme.navy),
@@ -488,7 +526,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
                     _evidenceArrow(),
                     _evidenceRow('इंश्योरेंस का खर्चा\n(Insurance Cost)', '- ₹${calc.insurance_cost.toStringAsFixed(0)}', isDeduction: true),
                     _evidenceArrow(),
-                    _evidenceRow('हाथ में कितने पैसे आए\n(Net Amount Received)', '₹${calc.net_disbursed_amount.toStringAsFixed(0)}', isBold: true),
+                    _evidenceRow('आपको वास्तव में मिले\n(Net Received)', '₹${calc.net_disbursed_amount.toStringAsFixed(0)}', isBold: true, isGreen: true),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Divider(color: Colors.black12, height: 1),
@@ -611,7 +649,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
     );
   }
 
-  Widget _evidenceRow(String label, String value, {bool highlight = false, bool isDeduction = false, bool isBold = false}) {
+  Widget _evidenceRow(String label, String value, {bool highlight = false, bool isDeduction = false, bool isBold = false, bool isGreen = false}) {
     if (highlight) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -653,7 +691,7 @@ class _TrueCostScreenState extends State<TrueCostScreen>
               style: TextStyle(
                 fontSize: AppTheme.bodyMin,
                 fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-                color: isDeduction ? AppTheme.red : AppTheme.navy,
+                color: isGreen ? AppTheme.green : (isDeduction ? AppTheme.red : AppTheme.navy),
                 letterSpacing: -0.5,
               )),
         ],
